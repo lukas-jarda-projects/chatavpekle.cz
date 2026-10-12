@@ -4,22 +4,21 @@
 // Reference ze SSR: node tools/snimky.mjs
 // Statická verze:   node tools/snimky.mjs http://localhost:8773 <scratchpad>/po 9334
 import { spawn } from "node:child_process";
-import { mkdtempSync, writeFileSync, mkdirSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
 
 const CHROME = "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const ZDROJ = process.argv[2] || "http://localhost:3124";
 const CIL = process.argv[3] || "C:/work/projects/chatavpekle.cz/.reference";
 const PORT = Number(process.argv[4] || 9333);
-const SCRATCH = dirname(fileURLToPath(import.meta.url));
 const STRANKY = { index: "/", cenik: "/cenik", fotky: "/fotky", okoli: "/okoli", kontakt: "/kontakt" };
 const SIRKY = [1280, 400];
 const VYSKA_OKNA = 800;
 const CEKANI_MS = 4000;
 
 mkdirSync(CIL, { recursive: true });
-const profil = mkdtempSync(join(SCRATCH, "cdp-"));
+const profil = mkdtempSync(join(tmpdir(), "chatavpekle-snimky-"));
 const chrome = spawn(CHROME, ["--headless=new", "--disable-gpu", "--hide-scrollbars",
   `--remote-debugging-port=${PORT}`, `--user-data-dir=${profil}`, "about:blank"], { stdio: "ignore" });
 const spi = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -60,5 +59,11 @@ try {
   }
 } finally {
   sock.close();
-  chrome.kill();
+  if (chrome.exitCode === null) {
+    const konec = new Promise((r) => chrome.once("exit", r));
+    chrome.kill();
+    await konec;
+  }
+  // Chrome po ukončení chvíli drží soubory profilu
+  rmSync(profil, { recursive: true, force: true, maxRetries: 10, retryDelay: 300 });
 }
