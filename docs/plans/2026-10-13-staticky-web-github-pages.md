@@ -10,7 +10,7 @@
 
 **Stav:** Plán napsán 2026-10-13. Předem ověřeno: build SSR s Node 16 projde a místní SSR vrací všech 5 stránek (Výchozí stav).
 - Task 0: hotový 2026-10-13 (výsledky v „Provedeno“ u Tasku 0). Místní SSR na portu 3124 se po konci session musí spustit znovu (krok 7).
-- Task 1: hotový 2026-10-13.
+- Task 1, Task 2: hotové 2026-10-13. Kontrola po Tasku 2: 16 chyb (rozpis v „Provedeno“ u Tasku 2).
 
 ---
 
@@ -205,6 +205,11 @@ Do `main()` za smazání skriptů přidat: ponechat jen první `<title>` (ostatn
 **Krok 3:** `python tools/kontrola.py`. Výsledek (počet a druh chyb) zapsat sem do „Provedeno“. Čekají se: chybějící `404.html`, galerie 0 fotek, stejná `meta description`, obrázky bez `alt` (loga v hlavičce a patičce, velké fotky `top-image`). `lang` už bude `cs` a `<title>` jeden.
 
 **Krok 4: Commit** „Převod SSR na statickou kostru“.
+
+**Provedeno 2026-10-13:** převod prošel: `chunky` 6 souborů (`3–8.*.css`), 5× `stranka`, `css app.css`, `css komponenty.css`, stažené `img/chvp_foto01–05.jpg`, 5 fontů, 4 favicony + `favicon.ico`, `statics/app-logo-128x128.png` a `statics/000-flags-select.svg` (odkazuje na něj `komponenty.css`, Task 7 rozhodne, jestli zůstane). Web má 3,3 MB.
+- `kontrola.py`: **16 chyb**, 110 odkazů. 5× `2x <img> bez alt` (logo v hlavičce `img.logo` a velká fotka `img.top-image`; logo v patičce má `alt="logo"`), 4× stejná `meta description`, `galerie má 0 fotek, má 20`, `404.html: soubor chybí` a navíc proti očekávání 5× `v <nav> nejsou odkazy` (SSR dal mobilní hlavičku bez `<nav>`, vyřeší Task 3). `lang` i `<title>` prošly.
+- Snímky kostry (`tools/snimky.mjs` na portu 8773) proti `.reference/`: písma, barvy a text sedí na 1280 i 400 px. Rozdíly: na 1280 px mobilní hlavička a patička (Task 3) a na obou šířkách obsah o ~120 px níž, což je stejný jev jako u Sunsetu (`q-page-container` s pevným `padding-top`, oprava v Tasku 3). Ceník na 400 px přetéká na 472 px i ve statické verzi.
+- Loga v hlavičce i patičce jsou vložená jako base64 SVG přímo v HTML.
 
 ---
 
