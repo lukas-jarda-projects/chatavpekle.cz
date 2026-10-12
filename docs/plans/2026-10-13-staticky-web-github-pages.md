@@ -9,7 +9,7 @@
 **Technologie:** HTML, CSS, vanilla JS (ES2017, bez knihoven). Nástroje v Pythonu 3: `tools/kontrola.py` je čistá stdlib, převodní skript potřebuje `beautifulsoup4` v lokálním venv. Node 16 se použije jen na build a běh SSR v Tasku 0.
 
 **Stav:** Plán napsán 2026-10-13. Předem ověřeno: build SSR s Node 16 projde a místní SSR vrací všech 5 stránek (Výchozí stav).
-- Task 0: kroky 1–3 a 9 hotové 2026-10-13 (výsledky v „Provedeno“ u Tasku 0). Zbývají kroky 4 (venv), 5 (Node 16 do `chatavpekle.cz-stare/.node16`), 7 (spustit SSR) a 8 (referenční snímky). Krok 6 (build) je hotový.
+- Task 0: hotový 2026-10-13 (výsledky v „Provedeno“ u Tasku 0). Místní SSR na portu 3124 se po konci session musí spustit znovu (krok 7).
 
 ---
 
@@ -129,7 +129,7 @@ PORT=3124 "$N/node.exe" dist/ssr/index.js
 
 Očekávané: `Server listening at port 3124`. Ověřit, že `/`, `/cenik`, `/fotky`, `/okoli`, `/kontakt` vrací 200. Port 3123 si nechávám pro Sunset, 3124 byl 2026-10-13 volný.
 
-**Krok 8: Referenční snímky** z místního SSR (5 stránek, 1280 a 400 px) do `.reference/`. Postup a pasti jako u Sunsetu („Poznatky z provádění“): headless Chrome, čerstvý `--user-data-dir` pro každý běh, mobil přes `<iframe width="400">` v okně 600 px, `MSYS_NO_PATHCONV=1`. Fotky galerie se v headless snímku nemusí načíst (u Sunsetu zachytil spinnery), galerii proto měřit v Chrome přes `getBoundingClientRect`.
+**Krok 8: Referenční snímky** z místního SSR (5 stránek, 1280 a 400 px) do `.reference/`: `node tools/snimky.mjs` (CDP, čerstvý profil Chrome při každém běhu). ~~Postup ze Sunsetu s `<iframe width="400">`~~ tady nefunguje, důvod je v „Provedeno“.
 
 **Krok 9: Commit**
 
@@ -143,6 +143,12 @@ git commit -m "Příprava převodu na statický web"
 - Krok 2: `C:/work/archive/chatavpekle.cz-pred-smazanim.git` (mirror, `master` = `8a799dd uprava ceny`, 15 commitů) a `C:/work/archive/chatavpekle.cz-lokalni-8a799dd.bundle` (8,9 MB, `bundle verify` = okay). Lokální `master` i `origin/master` = `8a799dd`.
 - Krok 3: `git init -b master` v `C:/work/projects/chatavpekle.cz`, `.gitignore` podle kroku 3 a navíc `*.stackdump`: Git Bash na tomhle stroji nechává v kořeni projektu `bash.exe.stackdump`, 2026-10-13 třikrát. Remote zatím žádný, repo na GitHubu vznikne v Tasku 10.
 - Krok 9: commit plánu a `.gitignore` (`b3b48e2` „Příprava převodu na statický web“).
+- Krok 4: `tools/.venv` s `beautifulsoup4` 4.15.0.
+- Krok 5: `node-v16.20.2-win-x64.zip: OK`, `node.exe --version` = `v16.20.2`.
+- Krok 7: `Server listening at port 3124`. `/` 200 (19 918 B), `/cenik` 200 (19 353), `/fotky` 200 (27 378), `/okoli` 200 (20 545), `/kontakt` 200 (18 998), `/neexistuje` 404 (20). Běží na pozadí z `chatavpekle.cz-stare` a po konci session se musí spustit znovu stejným příkazem.
+- Krok 8: 10 snímků v `.reference/` (`index|cenik|fotky|okoli|kontakt-1280|400.png`), skript `tools/snimky.mjs` (v repu, použije se i v Tasku 8). Výšky stránek na 1280 px: 2707, 1890, 3213, 1685, 1265; na 400 px: 2522, 1549, 1551, 1319, 1115. Fotky galerie se načetly všechny (na rozdíl od Sunsetu).
+  - **Neplatný pokus, neopakovat:** postup ze Sunsetu (`--screenshot`, mobil v `<iframe width="400">` v okně 600 px) dal na 400 px **vybledlý text**. Stránka po hydrataci spouští `fadeIn` a iframe z jiného originu (soubor `file://` → `localhost:3124`) běží v samostatném procesu, kam se `--virtual-time-budget` nepromítne, takže snímek zachytil animaci v půlce. Nepomohlo ani `--disable-site-isolation-trials --disable-features=IsolateOrigins,site-per-process`. Desktopový snímek s oknem 3200 px zase posunul patičku na dno okna, protože `q-page` má `min-height` podle výšky okna. Proto CDP: `Emulation.setDeviceMetricsOverride` (šířka 400 px bez omezení okna), 4 s skutečného čekání a `captureBeyondViewport` při výšce okna 800 px.
+  - **Vada originálu:** Ceník na 400 px má `scrollWidth` 472 px, tedy vodorovný přetok. Snímek je oříznutý na 400 px. V Tasku 8 zjistit, který prvek přetéká, a rozhodnout, jestli ho opravit (1:1 by znamenalo ponechat).
 
 Před KAŽDÝM commitem: v repu nesmí být interní hostitelé ani cesty Altisimy. Vzory jsou v `C:/work/archive/sunset-cisteni-historie/overeni.sh` (mimo repo), projít jimi `git grep` nad indexem.
 
@@ -283,7 +289,7 @@ Jedno pole `poschodi`, výstup `<div class="js-gallery …">` s `<a href="../sta
 
 ## Task 8: Vizuální porovnání se SSR
 
-Porovnat 5 stránek na 1280 a 400 px se `.reference/` a s živým místním SSR (port 3124) v iframe pevné šířky na obou originech (Sunset, „Poznatky“). Rozdíly opravit, nebo zapsat, proč zůstávají. Pak ukončit místní SSR (Task 0, krok 7).
+Porovnat 5 stránek na 1280 a 400 px se `.reference/`: statickou verzi nasnímkovat `node tools/snimky.mjs http://localhost:8773 <scratchpad>/po 9334` a měřit prvky přes CDP (`Runtime.evaluate` s `getBoundingClientRect`) na obou originech. Iframe tu kvůli `fadeIn` nefunguje (Task 0, „Provedeno“, krok 8). Vyřešit přetok Ceníku na 400 px (tamtéž). Rozdíly opravit, nebo zapsat, proč zůstávají. Pak ukončit místní SSR (Task 0, krok 7).
 
 **Commit** „Vizuální doladění podle SSR“.
 
