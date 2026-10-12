@@ -206,9 +206,9 @@ Do `main()` za smazání skriptů přidat: ponechat jen první `<title>` (ostatn
 
 **Krok 4: Commit** „Převod SSR na statickou kostru“.
 
-**Provedeno 2026-10-13:** převod prošel: `chunky` 6 souborů (`3–8.*.css`), 5× `stranka`, `css app.css`, `css komponenty.css`, stažené `img/chvp_foto01–05.jpg`, 5 fontů, 4 favicony + `favicon.ico`, `statics/app-logo-128x128.png` a `statics/000-flags-select.svg` (odkazuje na něj `komponenty.css`, Task 7 rozhodne, jestli zůstane). Web má 3,3 MB.
+**Provedeno 2026-10-13:** převod prošel: `chunky` 6 souborů (`3–8.*.css`), 5× `stranka`, `css app.css`, `css komponenty.css`, stažené `img/chvp_foto01–05.jpg`, 5 fontů, favicony `favicon-16x16/32x32/96x96.png` + `favicon.ico`, `statics/app-logo-128x128.png` a `statics/000-flags-select.svg` (odkazuje na něj `komponenty.css`, Task 7 rozhodne, jestli zůstane). Web má 3,3 MB.
 - `kontrola.py`: **16 chyb**, 110 odkazů. 5× `2x <img> bez alt` (logo v hlavičce `img.logo` a velká fotka `img.top-image`; logo v patičce má `alt="logo"`), 4× stejná `meta description`, `galerie má 0 fotek, má 20`, `404.html: soubor chybí` a navíc proti očekávání 5× `v <nav> nejsou odkazy` (SSR dal mobilní hlavičku bez `<nav>`, vyřeší Task 3). `lang` i `<title>` prošly.
-- Snímky kostry (`tools/snimky.mjs` na portu 8773) proti `.reference/`: písma, barvy a text sedí na 1280 i 400 px. Rozdíly: na 1280 px mobilní hlavička a patička (Task 3) a na obou šířkách obsah o ~120 px níž, což je stejný jev jako u Sunsetu (`q-page-container` s pevným `padding-top`, oprava v Tasku 3). Ceník na 400 px přetéká na 472 px i ve statické verzi.
+- Snímky kostry (`tools/snimky.mjs` na portu 8773) proti `.reference/`: písma, barvy a text sedí na 1280 i 400 px. Rozdíly: na 1280 px mobilní hlavička a patička (Task 3) a na obou šířkách je obsah níž. Posun jsem jen odhadl ze snímku (asi 120 px na 1280 px), neměřil. Příčina je stejná jako u Sunsetu: SSR dává `q-page-container` natvrdo `style="padding-top:350px"` a `q-header` `style="height:112px"`, po hydrataci to Quasar přepočítá podle skutečné hlavičky. Opraví se v Tasku 3. Ceník na 400 px přetéká na 472 px i ve statické verzi.
 - Loga v hlavičce i patičce jsou vložená jako base64 SVG přímo v HTML.
 
 ---
@@ -428,17 +428,21 @@ curl -sI https://chatavpekle.cz/neexistuje       # 404 s vlastní stránkou
 
 ```
 Pokračuj v projektu C:\work\projects\chatavpekle.cz podle plánu docs/plans/2026-10-13-staticky-web-github-pages.md (převod Quasar SSR webu Chata v Pekle na statické HTML na GitHub Pages, stejně jako Sunset-apartment.com).
-Skills: superpowers:executing-plans (plán má tasky s kontrolními body), superpowers:verification-before-completion (kontrola.py a ověření DNS a curl mají přesné očekávané výstupy).
+Skills: superpowers:executing-plans (plán má tasky s kontrolními body), superpowers:verification-before-completion (kontrola.py a snímky mají přesné očekávané výstupy).
 
-Stav (2026-10-13): plán napsán, z Tasku 0 hotové kroky 1–3 a 9 (staré repo přesunuto do C:\work\projects\chatavpekle.cz-stare, zálohy v C:/work/archive/, nové repo v C:\work\projects\chatavpekle.cz bez remote). Rozhodnutí uživatele: nové repo s čistou historií (staré zazálohovat a na GitHubu smazat), obsah 1:1 podle master, všechny animace ze Sunsetu. Živý web neběží (DNS míří na nedostupnou IP), převod tedy nic nevypíná.
-Ověřeno předem: build SSR projde jen s přenosným Node 16 (s Node 24 padá na sharp a node-sass), místní SSR na portu 3124 vrací všech 5 stránek. dist/ssr je hotový ve starém repu. SSR vykreslí MOBILNÍ hlavičku a patičku, desktopovou variantu je třeba napsat z Pugu (Task 3).
-Pokračuj Taskem 0 od kroku 4: venv s beautifulsoup4, Node 16 do C:\work\projects\chatavpekle.cz-stare\.node16 (s kontrolou SHA256), spuštění SSR na portu 3124 a referenční snímky do .reference/. Pak Task 1.
+Stav (2026-10-13): Tasky 0, 1 a 2 hotové. Kostra site/ je převedená ze SSR (commit 42ec2aa), tools/kontrola.py hlásí 16 chyb (rozpis v „Provedeno“ u Tasku 2: alt u loga a top-image, stejné popisy, galerie 0 fotek, chybí 404.html, 5× chybí <nav>). Referenční snímky SSR jsou v .reference/ (mimo git).
+Pokračuj Taskem 3: hlavička s <nav> (desktopová varianta ručně z Layout.vue a LayoutFooter.vue ve starém repu C:\work\projects\chatavpekle.cz-stare, SSR dal jen mobilní), mobilní panel, patička, web.js a web.css ze Sunsetu. Opravit i pevné style="padding-top:350px" na q-page-container ze SSR (obsah je proti SSR níž, stejný jev jako u Sunsetu Task 3).
+
+Před prací spusť na pozadí:
+- místní SSR (potřeba do Tasku 8): z C:\work\projects\chatavpekle.cz-stare příkaz PORT=3124 ./.node16/node-v16.20.2-win-x64/node.exe dist/ssr/index.js
+- náhled: python -m http.server -d site 8773 (z kořene repa)
+Snímky: node tools/snimky.mjs (reference ze SSR) nebo node tools/snimky.mjs http://localhost:8773 <scratchpad>/po 9334 (statická verze). Postup se <iframe> ze Sunsetu tu nefunguje kvůli fadeIn, viz Task 0 „Provedeno“, krok 8.
 
 Pozor:
-- Kód ze Sunsetu (tools/*.py, site/js/web.js, site/css/web.css, .github/workflows/pages.yml) se kopíruje a upravuje podle tasků; nepřebírat karusel, počítadla ani záložky galerie.
-- Scoped CSS stránek a galerie je v chuncích (komponenty.css) se selektory [data-v-…]: atributy data-v v markupu musí zůstat.
+- Kód ze Sunsetu (site/js/web.js, site/css/web.css, tools/galerie_z_vue.py, .github/workflows/pages.yml) se kopíruje a upravuje podle tasků; nepřebírat karusel, počítadla ani záložky galerie.
+- Scoped CSS stránek a galerie je v site/css/komponenty.css se selektory [data-v-…]: atributy data-v v markupu musí zůstat.
+- Ceník na 400 px přetéká na 472 px (vada originálu, je i v SSR). Řešit v Tasku 8.
 - Auto režim blokuje mazání repa a zakládání veřejného repa: příkazy dát uživateli přes ! na JEDEN řádek (Task 10).
-- Do plánu ani commitů nepiš interní hostitele a cesty Altisimy (jsou v package.json starého repa). Vzory: C:/work/archive/sunset-cisteni-historie/overeni.sh. Před commitem projít git grep.
-- Snímky headless Chromem: čerstvý --user-data-dir, mobil přes iframe 400 px, MSYS_NO_PATHCONV=1. Náhled na portu 8773 (8000 obsazený, 8772 Sunset).
+- Do plánu ani commitů nepiš interní hostitele a cesty Altisimy. Vzory: C:/work/archive/sunset-cisteni-historie/overeni.sh. Před commitem projít git grep --cached.
 - Otevřené otázky pro uživatele jsou v sekci „Otevřené“ (duplicity v galerii, texty popisů, starý server, 2 další A záznamy).
 ```
