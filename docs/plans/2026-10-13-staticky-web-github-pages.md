@@ -141,8 +141,8 @@ git commit -m "Příprava převodu na statický web"
 **Provedeno 2026-10-13:**
 - Krok 1: přesun prošel napodruhé. Poprvé `mv` hlásil „Device or resource busy“, protože pracovní adresář session byl uvnitř přesouvané složky. Před přesunem tedy nesmí žádný shell ani proces stát ve `chatavpekle.cz/chatavpekle.cz`. Ve `chatavpekle.cz-stare` je 15 commitů, `git status` ukazuje jen netrackovaný `src-ssr/` z buildu.
 - Krok 2: `C:/work/archive/chatavpekle.cz-pred-smazanim.git` (mirror, `master` = `8a799dd uprava ceny`, 15 commitů) a `C:/work/archive/chatavpekle.cz-lokalni-8a799dd.bundle` (8,9 MB, `bundle verify` = okay). Lokální `master` i `origin/master` = `8a799dd`.
-- Krok 3: `git init -b master` v `C:/work/projects/chatavpekle.cz`, `.gitignore` podle kroku 3. Remote zatím žádný, repo na GitHubu vznikne v Tasku 10.
-- Krok 9: commit plánu a `.gitignore` (hash v gitu, commit „Příprava převodu na statický web“).
+- Krok 3: `git init -b master` v `C:/work/projects/chatavpekle.cz`, `.gitignore` podle kroku 3 a navíc `*.stackdump`: Git Bash na tomhle stroji nechává v kořeni projektu `bash.exe.stackdump`, 2026-10-13 třikrát. Remote zatím žádný, repo na GitHubu vznikne v Tasku 10.
+- Krok 9: commit plánu a `.gitignore` (`b3b48e2` „Příprava převodu na statický web“).
 
 Před KAŽDÝM commitem: v repu nesmí být interní hostitelé ani cesty Altisimy. Vzory jsou v `C:/work/archive/sunset-cisteni-historie/overeni.sh` (mimo repo), projít jimi `git grep` nad indexem.
 

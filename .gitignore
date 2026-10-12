@@ -1,3 +1,5 @@
 # nástroje statického webu
 tools/.venv/
 .reference/
+# výpisy pádů Git Bashe
+*.stackdump
