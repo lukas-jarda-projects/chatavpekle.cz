@@ -10,6 +10,7 @@
 
 **Stav:** Plán napsán 2026-10-13. Předem ověřeno: build SSR s Node 16 projde a místní SSR vrací všech 5 stránek (Výchozí stav).
 - Task 0: hotový 2026-10-13 (výsledky v „Provedeno“ u Tasku 0). Místní SSR na portu 3124 se po konci session musí spustit znovu (krok 7).
+- Task 1: hotový 2026-10-13.
 
 ---
 
@@ -179,6 +180,8 @@ V `main()` nahradit `"photo/index.html"` za `"fotky/index.html"` (počet fotek).
 **Krok 2: RED.** `python tools/kontrola.py` bez `site/`. Očekávané: exit 1 a `CHYBA: chybí složka …` (tak to má `main()` Sunsetu). S prázdnou složkou `site/` pak 6× `…: soubor chybí`. Pak ověřit mutačně jednu kontrolu, která je nová (dva `<title>`), na dočasném `site/` ve scratchpadu nebo až v Tasku 2.
 
 **Krok 3: Commit** „Kontrolní skript statického webu“.
+
+**Provedeno 2026-10-13:** konstanty podle kroku 1, nová kontrola `{N}x <title>, má být právě 1` (čítač `titulku` v `Sber`), hláška o absolutní cestě teď jmenuje `/chatavpekle.cz/`. RED: bez `site/` exit 1 a `CHYBA: chybí složka …`; s prázdnou `site/` 6× `soubor chybí`, exit 1. Mutačně na kopii ve scratchpadu se SSR `index.html`: dva titulky („Chata v Pekle“, „Vencova Chata“) → `index.html: 2x <title>, má být právě 1`; po odstranění druhého hláška zmizí.
 
 ---
 
