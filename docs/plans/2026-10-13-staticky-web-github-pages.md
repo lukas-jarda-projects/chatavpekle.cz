@@ -18,6 +18,7 @@
 - Task 7: hotový 2026-10-13. Kontrola: 0 chyb, snímky beze změny (rozpis v „Provedeno“ u Tasku 7).
 - Task 8: hotový 2026-10-13. Přetok Ceníku a Úvodu na úzkém displeji opraven, kontrola 0 chyb (rozpis v „Provedeno“ u Tasku 8).
 - Task 9: hotový 2026-10-13. Workflow ze Sunsetu beze změny, krok se `sed` ověřen během nad kopií `site/` (rozpis v „Provedeno“ u Tasku 9).
+- Task 10: kroky 1–4 hotové 2026-10-13. Nové veřejné repo, Pages běží na náhledu, odkazy 0 chyb. **Zbývá krok 5**, test na telefonu (uživatel).
 
 ---
 
@@ -506,17 +507,19 @@ curl -sI https://chatavpekle.cz/neexistuje       # 404 s vlastní stránkou
 Pokračuj v projektu C:/work/projects/chatavpekle.cz podle plánu docs/plans/2026-10-13-staticky-web-github-pages.md (převod Quasar SSR webu Chata v Pekle na statické HTML na GitHub Pages, stejně jako Sunset-apartment.com).
 Skills: superpowers:executing-plans (plán má tasky s kontrolními body), superpowers:verification-before-completion (kontrola.py a snímky mají přesné očekávané výstupy).
 
-Stav (2026-10-13): Tasky 0–7 hotové. kontrola.py hlásí OK: 0 chyb, 212 odkazů. Galerie má 18 fotek (duplicity pryč) a lightbox ze Sunsetu prošel testem přes CDP (33 OK, chyby konzole 0). Titulky, popisy a alt texty uživatel schválil. Je hotový 404.html, robots.txt, sitemap.xml a README.md. Snímky proti .reference/ ukazují 0 px rozdílu u Úvodu, Ceníku, V okolí a Kontaktu. Fotky se liší jen o jednu řadu mřížky (18 místo 20 fotek), rozpis je v „Provedeno“ u Tasku 5. Repo zatím nemá remote (vznikne v Tasku 10), commity jsou jen lokálně.
-Pokračuj Taskem 8. Porovnání je z velké části hotové, zbývá přetok Ceníku na 400 px (scrollWidth 472, vada originálu, je i v SSR). Opravit ho, nebo zapsat, proč zůstává. Pak Task 9 (workflow ze Sunsetu beze změny, odkazy na web.css a web.js končí přesně web.css" a web.js" ve všech 5 stránkách, ověřeno grepem 2026-10-13; samotný sed z workflow zatím nikdo nespustil).
-Od Tasku 5 tools/snimky.mjs emuluje prefers-reduced-motion: reduce. Bez toho by fotky galerie pod ohybem zůstaly na snímku neviditelné. Referenční snímky SSR to neovlivňuje.
+Stav (2026-10-13): Tasky 0–9 hotové, Task 10 kroky 1–4 hotové. Repo lukas-jarda-projects/chatavpekle.cz je veřejné (staré smazané, mirror v C:/work/archive/chatavpekle.cz-pred-smazanim.git), větev master, push spouští workflow Pages. Náhled https://lukas-jarda-projects.github.io/chatavpekle.cz/ běží: 5 stránek 200, vlastní 404, /cenik 301 na /cenik/, interní odkazy 0 chyb, web.css a web.js s ?v=<commit>. Přetok Ceníku a Úvodu na úzkém displeji je opravený pravidlem na konci site/css/komponenty.css. Rozpis je v „Provedeno“ u Tasků 8–10.
 
-Náhled spusť na pozadí: python -m http.server -d site 8773 (z kořene repa). Místní SSR na Task 8 nepotřebuješ, referenční snímky jsou v .reference/ (mimo git). Kdyby bylo potřeba měřit SSR, spouští se z C:/work/projects/chatavpekle.cz-stare příkazem PORT=3124 ./.node16/node-v16.20.2-win-x64/node.exe dist/ssr/index.js. Stroj má málo paměti, procesy po práci zastav.
-Snímky: node tools/snimky.mjs http://localhost:8773 <scratchpad>/po 9334, pak pixelové porovnání s .reference/ přes PIL ImageChops (systémový Python). Měření prvků: node tools/mereni.mjs <url> <sirka> <soubor s JS výrazem>. Test lightboxu (lb_test.mjs) byl jen ve scratchpadu. Popis kontrol je v „Provedeno“ u Tasku 5, kdyby se měnil web.js, napiš ho znovu.
+Další kroky:
+1. Task 10, krok 5: výsledek testu na telefonu od uživatele (menu, panel, galerie, swipe, pinch) zapsat do plánu. Uživatel ho v minulé session ještě neposlal, zeptej se.
+2. Task 11: ověření domény v organizaci lukas-jarda-projects (Settings → Pages → Add a domain). Jde jen přes web GitHubu, buď uživatel, nebo ty přes Chrome (zeptej se). TXT záznam pak u Websupportu (služba 2072776), ověřit nslookup proti ns1.websupport.cz a teprve potom Verify.
+3. Task 12: převod DNS. Nejdřív v administraci Websupportu vypsat všechny záznamy a vyřešit otevřenou otázku 4 (co jsou 2 další A záznamy). IP GitHubu ověřit v aktuální dokumentaci. Pak cname přes gh api, certifikát, Enforce HTTPS, ověřovací příkazy z kroku 5 a ověřovací soubor Google (krok 6).
+4. Task 13: úklid. Staré repo mělo webhook do Jenkinsu Altisimy (push), se smazáním repa zanikl, ale job v Jenkinsu zůstává. To patří k otevřené otázce 3.
 
 Pozor:
 - V site/ je ověřovací soubor Google Search Console google554520753bcc9e67.html. Obsah neměnit a nemazat, ověřit až po převodu DNS (Task 12, krok 6).
 - Scoped CSS je v site/css/komponenty.css se selektory [data-v-…]: atributy data-v v markupu musí zůstat.
-- Auto režim blokuje mazání repa a zakládání veřejného repa: příkazy dát uživateli přes ! na JEDEN řádek (Task 10).
-- Do plánu ani commitů nepiš interní hostitele a cesty Altisimy. Vzory jsou v C:/work/archive/sunset-cisteni-historie/overeni.sh. Před commitem projdi git grep --cached.
-- Otevřené otázky pro uživatele: starý server 88.146.221.173 (Task 13) a 2 další A záznamy v DNS (Task 12). Otázky 1 a 2 jsou rozhodnuté.
+- Do plánu ani commitů nepiš interní hostitele a cesty Altisimy (repo je teď VEŘEJNÉ). Vzory jsou v C:/work/archive/sunset-cisteni-historie/overeni.sh. Před každým commitem projdi git grep a historii.
+- Python subprocess.run(["bash", …]) na Windows spustí WSL bash ze System32, který nepřevezme proměnné prostředí. Používej shutil.which("bash").
+- Lokální náhled: python -m http.server -d site 8773 (na pozadí, po práci zastavit, stroj má málo paměti). Kontrola: python tools/kontrola.py (OK: 0 chyb, 212 odkazů).
+- Otevřené otázky pro uživatele: starý server 88.146.221.173 a job v Jenkinsu (Task 13), 2 další A záznamy v DNS (Task 12). Otázky 1 a 2 jsou rozhodnuté.
 ```
