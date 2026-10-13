@@ -55,7 +55,7 @@
 
 ## Otevřené (zeptat se uživatele, až na ně dojde)
 
-1. **Duplicitní fotky v galerii** (Task 5): 1:1 znamená 20 náhledů včetně dvou opakovaných. Navrhnout odstranění duplicit (18 fotek). Výchozí stav do odpovědi je 1:1 (20).
+1. **Duplicitní fotky v galerii** (Task 5): 1:1 znamená 20 náhledů včetně dvou opakovaných. Navrhnout odstranění duplicit (18 fotek). Výchozí stav do odpovědi je 1:1 (20). **Rozhodnuto uživatelem 2026-10-13: duplicity vyhodit, 18 fotek.**
 2. **Texty `title` a `meta description`** pro 5 stránek (Task 6): navrhnout a nechat schválit. Spolu s nimi schválit `alt` velkých fotek (návrhy jsou už v HTML, výčet v „Provedeno“ u Tasku 4).
 3. **Kdo provozoval starý server na `88.146.221.173`** a jestli na něm (nebo v Jenkinsu Altisimy) zbyla služba nebo job webu, který by měl někdo zrušit (Task 13). U Sunsetu to byl Robert z Altisimy.
 4. **Co jsou ty „+ 2 A záznamy“** v DNS u Websupportu (Task 12). Zjistit v administraci, rozhodnout s uživatelem.
@@ -280,7 +280,7 @@ ZDROJ_FOTEK = KOREN.parent / "chatavpekle.cz-stare/src"
 
 Jedno pole `poschodi`, výstup `<div class="js-gallery …">` s `<a href="../statics/galerie/X.jpg" class="gallery-item"><img src="…" alt="…" loading="lazy" class="gek-screenshots" data-v-…></a>` (atribut `data-v-…` převzít z SSR `fotky/index.html`, 2026-10-13 to byl `data-v-e940f3e8`, jinak nepojedou scoped styly `.gek-screenshots` z chunku). Fotky kopírovat ze `ZDROJ_FOTEK`. `alt` je ve zdroji prázdný: použít „Chata v Pekle, fotka N“ (nebo texty schválené uživatelem). Kontejner a odsazení (`flex items-center justify-center`, `margin-left:-20px`) převzít z SSR.
 
-**Krok 1: Otevřená otázka 1** (duplicity): zeptat se. Podle odpovědi 20 nebo 18 fotek a stejné číslo do `FOTEK_V_GALERII`.
+**Krok 1: Otevřená otázka 1** (duplicity): ~~zeptat se~~ rozhodnuto 2026-10-13: **18 fotek**, každá jen jednou (v pořadí prvního výskytu v poli `poschodi`, druhé výskyty `20220515_105402.jpg` a `20220515_105317.jpg` vynechat). `FOTEK_V_GALERII` v `tools/kontrola.py` změnit z 20 na 18.
 
 **Krok 2:** Výstup skriptu vložit do `site/fotky/index.html` místo SSR mřížky. Kontrola: počet fotek sedí.
 
@@ -453,7 +453,8 @@ Pokračuj v projektu C:\work\projects\chatavpekle.cz podle plánu docs/plans/202
 Skills: superpowers:executing-plans (plán má tasky s kontrolními body), superpowers:verification-before-completion (kontrola.py a snímky mají přesné očekávané výstupy).
 
 Stav (2026-10-13): Tasky 0–4 hotové. Hlavička (desktop + mobilní panel, reveal), patička, site/js/web.js a site/css/web.css jsou hotové. Úvod, Ceník, V okolí a Kontakt jsou na snímcích shodné se SSR na pixel, Fotky se liší jen v galerii. tools/kontrola.py hlásí 6 chyb (rozpis v „Provedeno“ u Tasku 4). Referenční snímky SSR jsou v .reference/ (mimo git). Texty alt u velkých fotek jsou návrhy, schvalují se v Tasku 6.
-Pokračuj Taskem 5 (galerie a lightbox). Krok 1 je otevřená otázka 1 (duplicity v galerii): zeptej se uživatele, jestli 20 nebo 18 fotek. Pak Task 6.
+Pokračuj Taskem 5 (galerie a lightbox). Otázka duplicit je rozhodnutá: 18 fotek, duplicity pryč, FOTEK_V_GALERII v tools/kontrola.py na 18 (Task 5, krok 1). Pak Task 6.
+V site/ je od commitu dbbd192 ověřovací soubor Google Search Console google554520753bcc9e67.html (dodal uživatel). Obsah neměnit, nemazat při úklidu v Tasku 7. Ověřit ho v Search Console až po převodu DNS (Task 12, krok 6).
 
 Před prací spusť na pozadí náhled: python -m http.server -d site 8773 (z kořene repa). Místní SSR není potřeba až do Tasku 8; spouští se z C:\work\projects\chatavpekle.cz-stare příkazem PORT=3124 ./.node16/node-v16.20.2-win-x64/node.exe dist/ssr/index.js. Stroj má málo paměti, harness už jednou procesy na pozadí ukončil, takže je po práci zastav.
 Snímky: node tools/snimky.mjs http://localhost:8773 <scratchpad>/po 9334 (statická verze), pak pixelové porovnání s .reference/ přes PIL ImageChops (systémový Python). Měření prvků: node tools/mereni.mjs <url> <sirka> <soubor s JS výrazem>. Postup se <iframe> ze Sunsetu tu nefunguje kvůli fadeIn (Task 0, „Provedeno“, krok 8).
