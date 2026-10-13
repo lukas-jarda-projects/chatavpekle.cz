@@ -21,6 +21,8 @@ POVINNE = {
 # 1:1 s fotky.vue včetně 2 duplicit; po rozhodnutí o duplicitách případně 18
 FOTEK_V_GALERII = 18
 POVOLENE_HOSTY_SKRIPTU = set()
+ZNACKA_PRECHODU = "// Přechod z předchozí stránky"
+PRECHOD = re.compile(r'class="top-image"[^>]*/>\s*<script>\s*(' + re.escape(ZNACKA_PRECHODU) + r".*?)</script>", re.S)
 URL_V_CSS = re.compile(r"url\(\s*[\"']?([^\"')]+)[\"']?\s*\)")
 
 
@@ -97,7 +99,7 @@ def main():
     if not SITE.is_dir():
         print(f"CHYBA: chybí složka {SITE}")
         return 1
-    chyby, menu, pocet_odkazu, popisy = [], {}, 0, {}
+    chyby, menu, pocet_odkazu, popisy, prechody = [], {}, 0, {}, {}
     for rel in STRANKY:
         f = SITE / rel
         if not f.is_file():
@@ -141,6 +143,17 @@ def main():
             chyby.append(f"{rel}: galerie má {s.fotek} fotek, má {FOTEK_V_GALERII}")
         if not je_404:
             menu[rel] = [str(cil(f, h)) for h in s.nav]
+            # Vložený skript přechodu (prolnutí fotky, proužek menu) hned za horní fotkou, všude stejný
+            m = PRECHOD.search(text)
+            if not m:
+                chyby.append(f"{rel}: chybí vložený skript přechodu hned za <img class=\"top-image\">")
+            elif text.count(ZNACKA_PRECHODU) != 1:
+                chyby.append(f"{rel}: vložený skript přechodu je tu {text.count(ZNACKA_PRECHODU)}x")
+            else:
+                prechody[rel] = m.group(1)
+    for rel, skript in prechody.items():
+        if skript != prechody.get("index.html"):
+            chyby.append(f"{rel}: vložený skript přechodu se liší od index.html")
     vzor = menu.get("index.html")
     for rel, polozky in menu.items():
         if not polozky:

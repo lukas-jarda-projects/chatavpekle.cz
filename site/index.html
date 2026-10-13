@@ -89,6 +89,54 @@
        <div class="page-section" data-v-85ab2346="">
         <div data-v-85ab2346="">
          <img alt="Chata v Pekle, dřevěná chata s balkonem v lese" class="top-image" data-v-85ab2346="" src="img/chvp_foto01.jpg"/>
+         <script>
+          // Přechod z předchozí stránky (web.css .foto-predchozi; uložení dělá web.js a tento skript).
+          // Běží při načítání, aby byl stav nastavený před prvním vykreslením. Žádný View Transition,
+          // stránka je po celou dobu klikatelná. Stejný skript je ve všech 5 stránkách (tools/kontrola.py).
+          (function () {
+            try {
+              if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
+              // Horní fotka: stará se položí přes novou a po dekódování nové se rozpustí, jen když ji
+              // má prohlížeč hned v paměti (jinak by problikla)
+              var nova = document.currentScript.previousElementSibling
+              var predchozi = sessionStorage.getItem('chvp-foto')
+              sessionStorage.setItem('chvp-foto', nova.src)
+              if (predchozi && predchozi !== nova.src) {
+                var stara = new Image()
+                stara.decoding = 'sync'
+                stara.src = predchozi
+                if (stara.complete) {
+                  stara.alt = ''
+                  stara.className = 'top-image foto-predchozi'
+                  nova.parentNode.insertBefore(stara, nova)
+                  var prolnout = function () {
+                    getComputedStyle(stara).opacity
+                    stara.classList.add('prolnout')
+                    setTimeout(function () { stara.remove() }, 1700)
+                  }
+                  if (nova.decode) nova.decode().then(prolnout, prolnout)
+                  else if (nova.complete) prolnout()
+                  else nova.addEventListener('load', prolnout)
+                }
+              }
+              // Proužek pod položkou menu (desktop) dojede z místa, kde byl na předchozí stránce
+              var pruzek = JSON.parse(sessionStorage.getItem('chvp-pruzek') || 'null')
+              sessionStorage.removeItem('chvp-pruzek')
+              var ind = document.querySelector('.site-nav .q-tab--active .q-tab__indicator')
+              var r = ind && ind.getBoundingClientRect()
+              if (pruzek && r.width && Date.now() - pruzek.t < 5000) {
+                ind.style.transition = 'none'
+                ind.style.transform = 'translateX(' + (pruzek.l - r.left) + 'px) scaleX(' + pruzek.w / r.width + ')'
+                requestAnimationFrame(function () {
+                  requestAnimationFrame(function () {
+                    ind.style.transition = 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)'
+                    ind.style.transform = ''
+                  })
+                })
+              }
+            } catch (e) {}
+          })()
+         </script>
         </div>
        </div>
        <div class="page-section section-nadpis text-center" data-v-85ab2346="">

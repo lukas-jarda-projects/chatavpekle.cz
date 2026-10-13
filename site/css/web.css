@@ -75,58 +75,19 @@ body.menu-open .q-drawer__backdrop {
   }
 }
 
-/* Přechody mezi stránkami (View Transitions; prohlížeč bez podpory jen přepne stránku).
-   Stránka se přepne hned, jen horní fotka se pomalu prolne z původní do nové. Fotka zůstává
-   na místě nové stránky (skupina se nehýbe), všechny horní fotky mají stejný poměr stran.
-   Kliky během prolnutí posílá prohlížeč jen na <html>; odkazy a tlačítka zprovozňuje web.js. */
-@media (prefers-reduced-motion: no-preference) {
-  @view-transition {
-    navigation: auto;
-    types: stranka;
-  }
-  html:active-view-transition-type(stranka)::view-transition-group(root) {
-    animation: none;
-  }
-  .top-image {
-    view-transition-name: top-foto;
-  }
-  /* Logo z hlavičky přesahuje přes fotku: hlavička jde jako vlastní vrstva nad ni a přepne se hned */
-  .q-header {
-    view-transition-name: hlavicka;
-  }
-  ::view-transition-group(hlavicka) {
-    animation: none;
-  }
-  /* Detail fotky v galerii (přechod uvnitř stránky) horní fotku nemá zdržovat
-     a hlavička nesmí vyskočit nad tmavé pozadí */
-  html.vt-lokal .top-image,
-  html.vt-lokal .q-header {
-    view-transition-name: none;
-  }
-  ::view-transition-group(top-foto) {
-    animation-name: none;
-  }
-  ::view-transition-old(top-foto),
-  ::view-transition-new(top-foto) {
-    animation-duration: 1.5s;
-    animation-timing-function: var(--ease-prolnuti);
-  }
+/* Prolnutí horní fotky při přechodu na jinou stránku: vložený skript za fotkou v HTML položí
+   přes ni fotku z předchozí stránky (.foto-predchozi, stejné třídy, takže stejná velikost a místo)
+   a po dekódování nové fotky ji rozpustí. Obyčejný prvek ve stránce, takže menu, odkazy i hover
+   fungují po celou dobu prolnutí a prolnutí funguje ve všech prohlížečích. Stejně (bez View
+   Transitions) dojede proužek pod položkou menu z předchozí stránky. */
+.foto-predchozi {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  transition: opacity 1.5s var(--ease-prolnuti);
 }
-
-/* Hnědý proužek pod položkou menu při prokliku dojede na novou položku.
-   Jen desktop: na mobilu je menu po načtení stránky zavřené a proužek by odjel mimo obraz. */
-@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
-  .site-nav .q-tab--active .q-tab__indicator {
-    view-transition-name: nav-indikator;
-  }
-  /* Při přechodech uvnitř stránky (detail fotky) proužek nesmí vyskočit nad tmavé pozadí */
-  html.vt-lokal .site-nav .q-tab__indicator {
-    view-transition-name: none;
-  }
-  ::view-transition-group(nav-indikator) {
-    animation-duration: 0.35s;
-    animation-timing-function: var(--ease-standard);
-  }
+.foto-predchozi.prolnout {
+  opacity: 0;
 }
 
 /* Fotogalerie (JidelnaGallery.vue): náhled místo q-img, výřez na střed jako background-size cover.

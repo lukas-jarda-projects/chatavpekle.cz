@@ -8,9 +8,16 @@
   var EXIT = 'cubic-bezier(0.4, 0, 1, 1)'
 
   // Horní fotka: dokud se nenačte, leží nad ní záslepka se shimmerem (web.css .foto-zaslepka),
-  // po načtení se rozpustí. Fotka z cache (přechod mezi stránkami) záslepku nedostane.
-  var horni = document.querySelector('.top-image')
-  if (horni && !horni.complete) {
+  // po načtení se rozpustí. Fotka z cache záslepku nedostane, a při prolnutí z předchozí stránky
+  // (vložený skript v HTML, .foto-predchozi) drží místo stará fotka.
+  var horni = document.querySelector('.top-image:not(.foto-predchozi)')
+  // Návrat z bfcache vložený skript znovu nespustí: fotku pro příští prolnutí uloží tady
+  window.addEventListener('pageshow', function (e) {
+    if (!e.persisted || !horni) return
+    try { sessionStorage.setItem('chvp-foto', horni.src) } catch (chyba) {}
+  })
+  var prolinaSe = horni && horni.previousElementSibling && horni.previousElementSibling.classList.contains('foto-predchozi')
+  if (horni && !horni.complete && !prolinaSe) {
     var zaslepka = document.createElement('div')
     zaslepka.className = 'foto-zaslepka'
     var rodic = horni.parentNode
@@ -36,28 +43,16 @@
     horni.addEventListener('error', hotovo, { once: true })
   }
 
-  // Přechod mezi stránkami (prolnutí horní fotky, web.css): během něj prohlížeč posílá kliky
-  // jen na <html>. Klik na místo, kde leží odkaz nebo tlačítko, proto přechod ukončí a klikne
-  // na ten prvek. Přechody uvnitř stránky (detail fotky) nemají typ stranka a nechávají se být.
-  var prechodStranky = null
-  window.addEventListener('pagereveal', function (e) {
-    if (!e.viewTransition) return
-    prechodStranky = e.viewTransition
-    prechodStranky.finished.catch(function () {}).then(function () { prechodStranky = null })
-  })
-  document.addEventListener('click', function (e) {
-    var vt = document.activeViewTransition || prechodStranky
-    if (!vt || !vt.types || !vt.types.has('stranka') || e.target !== document.documentElement) return
-    var cil = null
-    document.querySelectorAll('a[href], button').forEach(function (el) {
-      var r = el.getBoundingClientRect()
-      if (r.width && e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) cil = el
+  // Proužek pod položkou menu: při prokliku se uloží, kde právě je, a vložený skript v nové
+  // stránce ho odtud nechá dojet na novou položku
+  document.querySelectorAll('.site-nav a.q-tab').forEach(function (a) {
+    a.addEventListener('click', function () {
+      var ind = document.querySelector('.site-nav .q-tab--active .q-tab__indicator')
+      var r = ind && ind.getBoundingClientRect()
+      if (!r || !r.width) return
+      try { sessionStorage.setItem('chvp-pruzek', JSON.stringify({ l: r.left, w: r.width, t: Date.now() })) } catch (e) {}
     })
-    if (!cil) return
-    e.preventDefault()
-    vt.skipTransition()
-    cil.click()
-  }, true)
+  })
 
   // Po načtení stránky se v klidu přednačtou horní fotky ostatních stránek, ať je prolnutí
   // při přechodu nemusí stahovat. Při úsporném režimu dat (Save-Data) se nepřednačítá.
@@ -173,7 +168,7 @@
     new Image().src = seznam[index(poloha + 1)].href
     new Image().src = seznam[index(poloha - 1)].href
   }
-  // Přechod uvnitř stránky; třída vt-lokal vypne proužek hlavního menu a nastaví délku prolnutí
+  // Přechod uvnitř stránky; třída vt-lokal nastaví délku prolnutí (web.css)
   function prechod (zmena) {
     if (!umiVT) { zmena(); return Promise.resolve() }
     var html = document.documentElement
