@@ -20,7 +20,8 @@
 - Task 9: hotový 2026-10-13. Workflow ze Sunsetu beze změny, krok se `sed` ověřen během nad kopií `site/` (rozpis v „Provedeno“ u Tasku 9).
 - Task 10: hotový 2026-10-13. Nové veřejné repo, Pages běží na náhledu, odkazy 0 chyb, test na telefonu OK (uživatel).
 - Task 11: hotový 2026-10-13. Doména ověřena v organizaci, TXT v DNS zůstává.
-- Task 12: kroky 1–5 hotové 2026-10-13. **Web běží na https://chatavpekle.cz/** (GitHub Pages, certifikát, Enforce HTTPS). Zbývá krok 6: Ověřit v Search Console.
+- Task 12: hotový 2026-10-13. **Web běží na https://chatavpekle.cz/** (GitHub Pages, certifikát, Enforce HTTPS). Search Console je ověřený a sitemap odeslaná. Stav sitemap „Nelze načíst“ zkontrolovat později (rozpis u kroku 6).
+- Task 13: čeká. Rozhodnutí uživatele 2026-10-13: staré repo `C:/work/projects/chatavpekle.cz-stare` smazat **nejdřív 2026-10-20** (týden bez problémů). Otevřená otázka 3 (starý server a job v Jenkinsu) trvá.
 
 ---
 
@@ -509,6 +510,7 @@ curl -sI https://chatavpekle.cz/neexistuje       # 404 s vlastní stránkou
 **Krok 6:** Pokud je doména v Google Search Console nebo Bing Webmaster (meta `google-site-verification` a `msvalidate.01` v hlavě to naznačují), odeslat `sitemap.xml`. Neověřeno, jestli ověření ještě platí.
 - **Google Search Console, ověření souborem (zadal uživatel 2026-10-13):** soubor `site/google554520753bcc9e67.html` je v repu od commitu „Ověřovací soubor Google Search Console“ a po nasazení bude na `https://chatavpekle.cz/google554520753bcc9e67.html`. Před převodem DNS ho Google nenajde, protože doména míří na mrtvý server. Po kroku 5 ověřit `curl -s https://chatavpekle.cz/google554520753bcc9e67.html` (musí vrátit `google-site-verification: google554520753bcc9e67.html`) a teprve pak v Search Console kliknout na **Ověřit**.
 - **2026-10-13 v 11:44:** `curl` ověřovacího souboru na ostré doméně vrací `google-site-verification: google554520753bcc9e67.html`. Kliknutí na Ověřit v Search Console zatím neproběhlo.
+- **Provedeno 2026-10-13 (přes Chrome, na pokyn uživatele):** v účtu Search Console uživatele nebyla žádná služba. Po přidání služby typu předpona URL `https://chatavpekle.cz/` hlásil Google „Vlastnictví ověřeno automaticky“, a to metodami Soubor HTML a Značka HTML. Ověřovací soubor i meta `google-site-verification` proto musí v `site/` zůstat. Odeslán `sitemap.xml` („Soubor Sitemap byl úspěšně odeslán“). Hned potom Search Console u sitemap ukazoval stav **„Nelze načíst“**, přestože `curl` vrací 200, `Content-Type: application/xml`, platné XML s 5× `<loc>` a `robots.txt` na sitemap odkazuje. Tento stav bývá po odeslání dočasný, ale ověřené to není. **Zkontrolovat** v Search Console → Soubory Sitemap. Bing Webmaster (`msvalidate.01`) se neřešil.
 
 ---
 
@@ -525,21 +527,22 @@ curl -sI https://chatavpekle.cz/neexistuje       # 404 s vlastní stránkou
 
 ```
 Pokračuj v projektu C:/work/projects/chatavpekle.cz podle plánu docs/plans/2026-10-13-staticky-web-github-pages.md (převod Quasar SSR webu Chata v Pekle na statické HTML na GitHub Pages, stejně jako Sunset-apartment.com).
-Skills: superpowers:executing-plans (plán má tasky s kontrolními body), superpowers:verification-before-completion (kontrola.py a snímky mají přesné očekávané výstupy).
+Skills: superpowers:verification-before-completion (úklid má ověřitelné výstupy, viz Task 13).
 
-Stav (2026-10-13): Tasky 0–9 hotové, Task 10 kroky 1–4 hotové. Repo lukas-jarda-projects/chatavpekle.cz je veřejné (staré smazané, mirror v C:/work/archive/chatavpekle.cz-pred-smazanim.git), větev master, push spouští workflow Pages. Náhled https://lukas-jarda-projects.github.io/chatavpekle.cz/ běží: 5 stránek 200, vlastní 404, /cenik 301 na /cenik/, interní odkazy 0 chyb, web.css a web.js s ?v=<commit>. Přetok Ceníku a Úvodu na úzkém displeji je opravený pravidlem na konci site/css/komponenty.css. Rozpis je v „Provedeno“ u Tasků 8–10.
+Stav (2026-10-13): Tasky 0–12 hotové. Web běží na https://chatavpekle.cz/ (GitHub Pages z repa lukas-jarda-projects/chatavpekle.cz, větev master, certifikát do 2027-01-11, Enforce HTTPS). www je CNAME, http i www přesměrují 301 na https://chatavpekle.cz/, /neexistuje vrací vlastní 404. Doména je ověřená v organizaci, TXT _github-pages-challenge-lukas-jarda-projects musí v DNS zůstat. Search Console je ověřený v účtu uživatele (soubor HTML i meta značka) a sitemap.xml odeslaná. Rozpis je v „Provedeno“ u Tasků 10–12.
 
 Další kroky:
-1. Task 10, krok 5: výsledek testu na telefonu od uživatele (menu, panel, galerie, swipe, pinch) zapsat do plánu. Uživatel ho v minulé session ještě neposlal, zeptej se.
-2. Task 11: ověření domény v organizaci lukas-jarda-projects (Settings → Pages → Add a domain). Jde jen přes web GitHubu, buď uživatel, nebo ty přes Chrome (zeptej se). TXT záznam pak u Websupportu (služba 2072776), ověřit nslookup proti ns1.websupport.cz a teprve potom Verify.
-3. Task 12: převod DNS. Nejdřív v administraci Websupportu vypsat všechny záznamy a vyřešit otevřenou otázku 4 (co jsou 2 další A záznamy). IP GitHubu ověřit v aktuální dokumentaci. Pak cname přes gh api, certifikát, Enforce HTTPS, ověřovací příkazy z kroku 5 a ověřovací soubor Google (krok 6).
-4. Task 13: úklid. Staré repo mělo webhook do Jenkinsu Altisimy (push), se smazáním repa zanikl, ale job v Jenkinsu zůstává. To patří k otevřené otázce 3.
+1. Search Console → Soubory Sitemap: hned po odeslání ukazoval stav „Nelze načíst“, přestože sitemap vrací 200 a platné XML. Zkontrolovat, jestli se stav změnil. Když ne, zjistit příčinu (Task 12, krok 6).
+2. Task 13, nejdřív 2026-10-20 (rozhodnutí uživatele: týden bez problémů): smazat C:/work/projects/chatavpekle.cz-stare (včetně .node16/). Zálohy v C:/work/archive/ ponechat. Pak plán označit jako dokončený (do Stav hash a datum převodu 2026-10-13).
+3. Scope delete_repo u tokenu gh: příkaz `gh auth refresh -h github.com -r delete_repo` spouští uživatel přes `!` (interaktivní přihlášení). Zeptat se, jestli už to udělal (`gh auth status` ukazuje scopes).
+4. Otevřená otázka 3: starý server 88.146.221.173 a job v Jenkinsu Altisimy (webhook zanikl se smazáním starého repa). Zeptat se uživatele.
 
 Pozor:
-- V site/ je ověřovací soubor Google Search Console google554520753bcc9e67.html. Obsah neměnit a nemazat, ověřit až po převodu DNS (Task 12, krok 6).
+- V site/ je ověřovací soubor Google Search Console google554520753bcc9e67.html a v hlavičkách 5 stránek (ne 404) meta google-site-verification. Na obojím stojí ověření, nemazat ani neměnit.
+- DNS u Websupportu (administrace Active24, https://admin.websupport.cz/cs/dns/2072776/records): formulář je po načtení asi 5 s neaktivní a dřívější uložení tiše neproběhne. Po každém uložení kontrolovat zelenou hlášku.
 - Scoped CSS je v site/css/komponenty.css se selektory [data-v-…]: atributy data-v v markupu musí zůstat.
 - Do plánu ani commitů nepiš interní hostitele a cesty Altisimy (repo je teď VEŘEJNÉ). Vzory jsou v C:/work/archive/sunset-cisteni-historie/overeni.sh. Před každým commitem projdi git grep a historii.
 - Python subprocess.run(["bash", …]) na Windows spustí WSL bash ze System32, který nepřevezme proměnné prostředí. Používej shutil.which("bash").
 - Lokální náhled: python -m http.server -d site 8773 (na pozadí, po práci zastavit, stroj má málo paměti). Kontrola: python tools/kontrola.py (OK: 0 chyb, 212 odkazů).
-- Otevřené otázky pro uživatele: starý server 88.146.221.173 a job v Jenkinsu (Task 13), 2 další A záznamy v DNS (Task 12). Otázky 1 a 2 jsou rozhodnuté.
+- Otevřená otázka pro uživatele: jen otázka 3 (starý server 88.146.221.173 a job v Jenkinsu, Task 13). Otázky 1, 2 a 4 jsou vyřešené.
 ```
