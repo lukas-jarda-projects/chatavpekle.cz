@@ -12,6 +12,7 @@
 - Task 0: hotový 2026-10-13 (výsledky v „Provedeno“ u Tasku 0). Místní SSR na portu 3124 se po konci session musí spustit znovu (krok 7).
 - Task 1, Task 2: hotové 2026-10-13. Kontrola po Tasku 2: 16 chyb (rozpis v „Provedeno“ u Tasku 2).
 - Task 3: hotový 2026-10-13. Kontrola: 11 chyb, Úvod, V okolí a Kontakt jsou na snímcích shodné se SSR na pixel (rozpis v „Provedeno“ u Tasku 3).
+- Task 4: hotový 2026-10-13. Kontrola: 6 chyb, všechny stránky kromě galerie Fotek shodné se SSR na pixel (rozpis v „Provedeno“ u Tasku 4).
 
 ---
 
@@ -55,7 +56,7 @@
 ## Otevřené (zeptat se uživatele, až na ně dojde)
 
 1. **Duplicitní fotky v galerii** (Task 5): 1:1 znamená 20 náhledů včetně dvou opakovaných. Navrhnout odstranění duplicit (18 fotek). Výchozí stav do odpovědi je 1:1 (20).
-2. **Texty `title` a `meta description`** pro 5 stránek (Task 6): navrhnout a nechat schválit.
+2. **Texty `title` a `meta description`** pro 5 stránek (Task 6): navrhnout a nechat schválit. Spolu s nimi schválit `alt` velkých fotek (návrhy jsou už v HTML, výčet v „Provedeno“ u Tasku 4).
 3. **Kdo provozoval starý server na `88.146.221.173`** a jestli na něm (nebo v Jenkinsu Altisimy) zbyla služba nebo job webu, který by měl někdo zrušit (Task 13). U Sunsetu to byl Robert z Altisimy.
 4. **Co jsou ty „+ 2 A záznamy“** v DNS u Websupportu (Task 12). Zjistit v administraci, rozhodnout s uživatelem.
 
@@ -253,10 +254,18 @@ Obsah je v SSR celý, jen kontrola a úklid:
 - `transition appear … animated fadeIn` z Quasaru: SSR třídy `animated fadeIn` nevykreslí (0× v `/`, ověřeno 2026-10-13), efekt běžel jen po hydrataci. 1:1 se statickým HTML tedy znamená bez něj. Nic nedoplňovat.
 - odkazy V okolí a Kontaktu: `target="_blank"` doplnit o `rel="noopener"`,
 - `mailto:` a `tel:` beze změny,
-- **Ceník: mezera před „Kč“.** `prettify()` z Tasku 2 vložil konec řádku mezi `12 500` a `<span class="kc">`. Pug má `.cena 12 500` a hned `span.kc &nbsp;Kč`, takže mezera přibyla navíc k `&nbsp;` a „Kč“ je o pár px vpravo (993 px rozdílu proti `.reference/`, zjištěno v Tasku 3). Obě ceny zapsat na jeden řádek: `12 500<span class="kc" data-v-90ebed12="">&nbsp;Kč</span>`. Stejný jev hledat i u jiných inline prvků (snímky ukážou rozdíl).
+- **Ceník: mezera před „Kč“.** `prettify()` z Tasku 2 vložil konec řádku mezi `12 500` a `<span class="kc">`. Pug má `.cena 12 500` a hned `span.kc &nbsp;Kč`, takže mezera přibyla navíc k `&nbsp;` (příčina upřesněna v „Provedeno“: `&nbsp;` zmizel) a „Kč“ je o pár px vpravo (993 px rozdílu proti `.reference/`, zjištěno v Tasku 3). Obě ceny zapsat na jeden řádek: `12 500<span class="kc" data-v-90ebed12="">&nbsp;Kč</span>`. Stejný jev hledat i u jiných inline prvků (snímky ukážou rozdíl).
 - scoped styly stránek (`.text-block`, `.cena`, `.kc`, seznamy) jsou v chuncích → `komponenty.css`. Selektory nesou `[data-v-…]`, takže atributy `data-v-…` v markupu MUSÍ zůstat. Ověřit vzhled proti `.reference/`.
 
 **Commit** „Stránky Úvod, Ceník, V okolí, Kontakt“.
+
+**Provedeno 2026-10-13:**
+- Ceník: obě ceny na jeden řádek s `&nbsp;Kč` podle Pugu. Příčina rozdílu byla jiná, než Task 3 odhadl: `prettify()` z `&nbsp;` udělal znak U+00A0 a ořezávání textu ho smazalo (Python `strip()` bere U+00A0 jako mezeru). Zbyla tak jen běžná mezera z konce řádku. Ta se zhroutila do mezery v kontextu `.cena`, tedy ve větším písmu než `.kc`, a proto bylo „Kč“ dál. Jiné `&nbsp;` v obsahu stránek nejsou (grep Vue zdrojů: jen Ceník, hlavička a patička, ty přepsal Task 3 i s `&nbsp;`).
+- `rel="noopener"` u 15 odkazů `target="_blank"` (V okolí 11, Kontakt 4).
+- `alt` u 5 velkých fotek. Jsou to NÁVRHY, schválit v Tasku 6 (otevřená otázka 2): Úvod „Chata v Pekle, dřevěná chata s balkonem v lese“, Ceník „Chata v Pekle, štít chaty s číslem 120 mezi buky“, Fotky „Chata v Pekle, chata s balkonem z boku“, V okolí „Zahrada chaty s grilem a výhledem na Jizerské hory“, Kontakt „Mapa okolí obce Peklo s polohou chaty“ (`chvp_foto05.jpg` je mapa, ne fotka).
+- `fadeIn` nedoplněn (viz výše). `mailto:` a `tel:` beze změny.
+- Snímky proti `.reference/`: Úvod, Ceník, V okolí a Kontakt **0 px rozdílu** na 1280 i 400 px. Fotky se liší jen v galerii (Task 5).
+- `kontrola.py`: **6 chyb**, 175 odkazů: 4× stejná description (Task 6), galerie 0/20 (Task 5), chybí `404.html` (Task 6).
 
 ---
 
@@ -442,8 +451,8 @@ curl -sI https://chatavpekle.cz/neexistuje       # 404 s vlastní stránkou
 Pokračuj v projektu C:\work\projects\chatavpekle.cz podle plánu docs/plans/2026-10-13-staticky-web-github-pages.md (převod Quasar SSR webu Chata v Pekle na statické HTML na GitHub Pages, stejně jako Sunset-apartment.com).
 Skills: superpowers:executing-plans (plán má tasky s kontrolními body), superpowers:verification-before-completion (kontrola.py a snímky mají přesné očekávané výstupy).
 
-Stav (2026-10-13): Tasky 0–3 hotové. Hlavička (desktop + mobilní panel, reveal), patička, site/js/web.js a site/css/web.css jsou hotové. Úvod, V okolí a Kontakt jsou na snímcích shodné se SSR na pixel. tools/kontrola.py hlásí 11 chyb (rozpis v „Provedeno“ u Tasku 3). Referenční snímky SSR jsou v .reference/ (mimo git).
-Pokračuj Taskem 4 (stránky Úvod, Ceník, V okolí, Kontakt). Zahrň opravu mezery před „Kč“ na Ceníku, popsanou přímo v Tasku 4 (prettify přidal mezeru, 993 px rozdílu proti referenci). Pak Task 5 (galerie).
+Stav (2026-10-13): Tasky 0–4 hotové. Hlavička (desktop + mobilní panel, reveal), patička, site/js/web.js a site/css/web.css jsou hotové. Úvod, Ceník, V okolí a Kontakt jsou na snímcích shodné se SSR na pixel, Fotky se liší jen v galerii. tools/kontrola.py hlásí 6 chyb (rozpis v „Provedeno“ u Tasku 4). Referenční snímky SSR jsou v .reference/ (mimo git). Texty alt u velkých fotek jsou návrhy, schvalují se v Tasku 6.
+Pokračuj Taskem 5 (galerie a lightbox). Krok 1 je otevřená otázka 1 (duplicity v galerii): zeptej se uživatele, jestli 20 nebo 18 fotek. Pak Task 6.
 
 Před prací spusť na pozadí náhled: python -m http.server -d site 8773 (z kořene repa). Místní SSR není potřeba až do Tasku 8; spouští se z C:\work\projects\chatavpekle.cz-stare příkazem PORT=3124 ./.node16/node-v16.20.2-win-x64/node.exe dist/ssr/index.js. Stroj má málo paměti, harness už jednou procesy na pozadí ukončil, takže je po práci zastav.
 Snímky: node tools/snimky.mjs http://localhost:8773 <scratchpad>/po 9334 (statická verze), pak pixelové porovnání s .reference/ přes PIL ImageChops (systémový Python). Měření prvků: node tools/mereni.mjs <url> <sirka> <soubor s JS výrazem>. Postup se <iframe> ze Sunsetu tu nefunguje kvůli fadeIn (Task 0, „Provedeno“, krok 8).
