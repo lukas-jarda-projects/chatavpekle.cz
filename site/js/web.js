@@ -2,6 +2,75 @@
 (function () {
   'use strict'
   var klid = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  // Křivky animací, stejné jako proměnné --ease-* ve web.css
+  var STANDARD = 'cubic-bezier(0.4, 0, 0.2, 1)'
+  var ENTER = 'cubic-bezier(0, 0, 0.2, 1)'
+  var EXIT = 'cubic-bezier(0.4, 0, 1, 1)'
+
+  // Horní fotka: dokud se nenačte, leží nad ní záslepka se shimmerem (web.css .foto-zaslepka),
+  // po načtení se rozpustí. Fotka z cache (přechod mezi stránkami) záslepku nedostane.
+  var horni = document.querySelector('.top-image')
+  if (horni && !horni.complete) {
+    var zaslepka = document.createElement('div')
+    zaslepka.className = 'foto-zaslepka'
+    var rodic = horni.parentNode
+    if (getComputedStyle(rodic).position === 'static') rodic.style.position = 'relative'
+    var umisti = function () {
+      zaslepka.style.left = horni.offsetLeft + 'px'
+      zaslepka.style.top = horni.offsetTop + 'px'
+      zaslepka.style.width = horni.offsetWidth + 'px'
+      zaslepka.style.height = horni.offsetHeight + 'px'
+    }
+    umisti()
+    rodic.appendChild(zaslepka)
+    window.addEventListener('resize', umisti)
+    var hotovo = function () {
+      window.removeEventListener('resize', umisti)
+      zaslepka.classList.add('pryc')
+      setTimeout(function () { zaslepka.remove() }, 700)
+    }
+    var dekoduj = function () {
+      ;(horni.decode ? horni.decode().catch(function () {}) : Promise.resolve()).then(hotovo)
+    }
+    horni.addEventListener('load', dekoduj, { once: true })
+    horni.addEventListener('error', hotovo, { once: true })
+  }
+
+  // Přechod mezi stránkami (prolnutí horní fotky, web.css): během něj prohlížeč posílá kliky
+  // jen na <html>. Klik na místo, kde leží odkaz nebo tlačítko, proto přechod ukončí a klikne
+  // na ten prvek. Přechody uvnitř stránky (detail fotky) nemají typ stranka a nechávají se být.
+  var prechodStranky = null
+  window.addEventListener('pagereveal', function (e) {
+    if (!e.viewTransition) return
+    prechodStranky = e.viewTransition
+    prechodStranky.finished.catch(function () {}).then(function () { prechodStranky = null })
+  })
+  document.addEventListener('click', function (e) {
+    var vt = document.activeViewTransition || prechodStranky
+    if (!vt || !vt.types || !vt.types.has('stranka') || e.target !== document.documentElement) return
+    var cil = null
+    document.querySelectorAll('a[href], button').forEach(function (el) {
+      var r = el.getBoundingClientRect()
+      if (r.width && e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) cil = el
+    })
+    if (!cil) return
+    e.preventDefault()
+    vt.skipTransition()
+    cil.click()
+  }, true)
+
+  // Po načtení stránky se v klidu přednačtou horní fotky ostatních stránek, ať je prolnutí
+  // při přechodu nemusí stahovat. Při úsporném režimu dat (Save-Data) se nepřednačítá.
+  if (horni && !(navigator.connection && navigator.connection.saveData)) {
+    window.addEventListener('load', function () {
+      var spust = window.requestIdleCallback || function (f) { setTimeout(f, 1000) }
+      spust(function () {
+        for (var i = 1; i <= 5; i++) {
+          new Image().src = horni.src.replace(/chvp_foto0\d\.jpg$/, 'chvp_foto0' + i + '.jpg')
+        }
+      })
+    })
+  }
 
   // Třídy gt-* na #q-app podle šířky okna (jako App.vue; první nastavení dělá vložený skript ve stránce)
   var koren = document.getElementById('q-app')
@@ -127,7 +196,7 @@
         if (letet) obr.style.viewTransitionName = 'foto'
         box.hidden = false
         document.body.classList.add('lightbox-open')
-        if (!umiVT && !klid && box.animate) box.animate([{ opacity: 0 }, { opacity: 1 }], 250)
+        if (!umiVT && !klid && box.animate) box.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: ENTER })
       })
     }).then(function () {
       obr.style.viewTransitionName = ''
@@ -177,7 +246,7 @@
     var H = box.clientHeight
     zoom.x = w <= W ? (W - w) / 2 - lx : Math.min(-lx, Math.max(W - w - lx, zoom.x))
     zoom.y = h <= H ? (H - h) / 2 - ly : Math.min(-ly, Math.max(H - h - ly, zoom.y))
-    obr.style.transition = plynule && !klid ? 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)' : ''
+    obr.style.transition = plynule && !klid ? 'transform 0.25s ' + STANDARD : ''
     obr.style.transform = priblizeno() ? 'translate(' + zoom.x + 'px, ' + zoom.y + 'px) scale(' + zoom.s + ')' : ''
     obr.classList.toggle('priblizeno', priblizeno())
   }
@@ -279,7 +348,7 @@
     var ven = obr.animate([
       { opacity: 1, transform: 'none' },
       { opacity: 0, transform: 'translateX(' + (-smer * 48) + 'px)' }
-    ], { duration: 160, easing: 'ease-in', fill: 'forwards' })
+    ], { duration: 160, easing: EXIT, fill: 'forwards' })
     Promise.all([ven.finished, nacti(n)]).then(function () {
       nastav(n)
       return obr.decode ? obr.decode().catch(nic) : null
@@ -288,7 +357,7 @@
       return obr.animate([
         { opacity: 0, transform: 'translateX(' + (smer * 48) + 'px)' },
         { opacity: 1, transform: 'none' }
-      ], { duration: 220, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' }).finished
+      ], { duration: 220, easing: ENTER }).finished
     }).catch(nic).then(function () { bezi = false })
   }
   function vytvorBox () {

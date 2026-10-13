@@ -1,35 +1,84 @@
 /* Styly statického webu nad CSS Quasaru (app.css, komponenty.css). */
 
+/* Křivky animací (Material): co se objevuje, zpomaluje do klidu (enter); co odchází, zrychluje
+   pryč (exit); pohyb mezi dvěma stavy na obrazovce má standard; pomalé prolnutí fotek sine. */
+:root {
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-enter: cubic-bezier(0, 0, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-prolnuti: cubic-bezier(0.37, 0, 0.63, 1);
+}
+
 /* Hlavička: obě varianty z Layout.vue jsou v HTML, přepínají je třídy Quasaru gt-sm / lt-md
-   (hranice 1024 px, dřív $q.screen.lt.md). Pod 1024 px hamburger a panel zleva (q-drawer). */
+   (hranice 1024 px, dřív $q.screen.lt.md). Pod 1024 px hamburger a panel zleva (q-drawer).
+   Panel přijede za 0,25 s (enter) a odjede za 0,2 s (exit). */
 .q-drawer {
   visibility: hidden;
-  transition: transform 0.12s, visibility 0.12s !important;
+  transition: transform 0.2s var(--ease-exit), visibility 0.2s !important;
 }
 body.menu-open .q-drawer {
   transform: none;
   visibility: visible;
+  transition: transform 0.25s var(--ease-enter), visibility 0.25s !important;
 }
 .q-drawer__backdrop {
   visibility: hidden;
   background-color: transparent;
-  transition: background-color 0.12s, visibility 0.12s !important;
+  transition: background-color 0.2s var(--ease-exit), visibility 0.2s !important;
 }
 body.menu-open .q-drawer__backdrop {
   visibility: visible;
   background-color: rgba(0, 0, 0, 0.4);
+  transition: background-color 0.25s var(--ease-enter), visibility 0.25s !important;
 }
 
 /* q-header reveal: web.js hlavičku při scrollu dolů schová třídou q-header--hidden (app.css) */
 @media (prefers-reduced-motion: no-preference) {
   .q-header {
-    transition: transform 0.12s;
+    transition: transform 0.25s var(--ease-enter);
+  }
+  .q-header.q-header--hidden {
+    transition: transform 0.2s var(--ease-exit);
+  }
+}
+
+/* Horní fotka: rámeček drží místo už před načtením (všechny mají 1798 × 814) a do načtení
+   v něm běží jemný shimmer. web.js nad nenačtenou fotku položí .foto-zaslepka a po načtení
+   ji rozpustí, takže se fotka do rámečku prolne. */
+.top-image {
+  aspect-ratio: 1798 / 814;
+  height: auto;
+  background-color: #ece8e1;
+}
+.foto-zaslepka {
+  position: absolute;
+  border-radius: 25px;
+  pointer-events: none;
+  background: #ece8e1 linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.55) 50%, transparent 70%) no-repeat;
+  background-size: 200% 100%;
+  transition: opacity 0.6s var(--ease-enter);
+}
+.foto-zaslepka.pryc {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .foto-zaslepka {
+    animation: shimmer 1.6s var(--ease-standard) infinite;
+  }
+}
+@keyframes shimmer {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
   }
 }
 
 /* Přechody mezi stránkami (View Transitions; prohlížeč bez podpory jen přepne stránku).
    Stránka se přepne hned, jen horní fotka se pomalu prolne z původní do nové. Fotka zůstává
-   na místě nové stránky (skupina se nehýbe), všechny horní fotky mají stejný poměr stran. */
+   na místě nové stránky (skupina se nehýbe), všechny horní fotky mají stejný poměr stran.
+   Kliky během prolnutí posílá prohlížeč jen na <html>; odkazy a tlačítka zprovozňuje web.js. */
 @media (prefers-reduced-motion: no-preference) {
   @view-transition {
     navigation: auto;
@@ -59,8 +108,8 @@ body.menu-open .q-drawer__backdrop {
   }
   ::view-transition-old(top-foto),
   ::view-transition-new(top-foto) {
-    animation-duration: 1.8s;
-    animation-timing-function: ease-in-out;
+    animation-duration: 1.5s;
+    animation-timing-function: var(--ease-prolnuti);
   }
 }
 
@@ -76,7 +125,7 @@ body.menu-open .q-drawer__backdrop {
   }
   ::view-transition-group(nav-indikator) {
     animation-duration: 0.35s;
-    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    animation-timing-function: var(--ease-standard);
   }
 }
 
@@ -96,7 +145,7 @@ body.menu-open .q-drawer__backdrop {
 }
 @media (prefers-reduced-motion: no-preference) {
   .js-gallery .gek-screenshots {
-    transition: transform 0.6s ease;
+    transition: transform 0.45s var(--ease-enter);
   }
   .gallery-item:hover .gek-screenshots,
   .gallery-item:focus-visible .gek-screenshots {
@@ -170,15 +219,16 @@ body.lightbox-open {
 .js-odhal .gallery-item.videt {
   opacity: 1;
   transform: none;
-  transition: opacity 0.45s ease-out, transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.45s var(--ease-enter), transform 0.45s var(--ease-enter);
   transition-delay: var(--zpozdeni, 0ms);
 }
 /* Detail: fotka přeletí z náhledu do lightboxu a zpět, tmavé pozadí se prolne */
 ::view-transition-group(foto) {
   animation-duration: 0.35s;
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-timing-function: var(--ease-standard);
 }
 html.vt-lokal::view-transition-old(root),
 html.vt-lokal::view-transition-new(root) {
   animation-duration: 0.35s;
+  animation-timing-function: var(--ease-standard);
 }
