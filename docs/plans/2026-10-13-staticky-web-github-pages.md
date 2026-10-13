@@ -15,6 +15,7 @@
 - Task 4: hotový 2026-10-13. Kontrola: 6 chyb, všechny stránky kromě galerie Fotek shodné se SSR na pixel (rozpis v „Provedeno“ u Tasku 4).
 - Task 5: hotový 2026-10-13. Kontrola: 5 chyb, test lightboxu 33 OK (rozpis v „Provedeno“ u Tasku 5).
 - Task 6: hotový 2026-10-13. Kontrola: **0 chyb** (rozpis v „Provedeno“ u Tasku 6).
+- Task 7: hotový 2026-10-13. Kontrola: 0 chyb, snímky beze změny (rozpis v „Provedeno“ u Tasku 7).
 
 ---
 
@@ -332,6 +333,13 @@ Jedno pole `poschodi`, výstup `<div class="js-gallery …">` s `<a href="../sta
 
 **Commit** „Úklid markupu, README“.
 
+**Provedeno 2026-10-13:**
+- Ze všech 5 stránek odstraněn skript `window.__Q_META__` (starý titulek, bez Vue mrtvý), dva prázdné komentáře `<!-- -->` po Vue a atribut `rounded-borders=""` na `.q-layout` (atribut, ne třída, CSS na něj nereaguje).
+- **Vědomě ponecháno:** `div.q-focus-helper tabindex="-1"` v položkách menu (10× na stránku; CSS Quasaru na nich kreslí hover, `-1` nejde do pořadí Tabu), třídy `desktop no-touch body--light` na `body` (podmiňují styly Quasaru), inline `style` z SSR (výšky hlavičky a stránky), `q-drawer-container` (je to mobilní panel). Atributy `aria-*` napsal Task 3 a odpovídají chování `web.js`. Zbylé 4 komentáře na stránku jsou popisné z Tasku 3.
+- `README.md`: co je web, struktura, kde se mění ceny a galerie, náhled, kontrola, odkaz na plán.
+- Soubory bez odkazu (skript ve scratchpadu, odkazy z HTML i `url()` v CSS): jen `404.html`, `google554520753bcc9e67.html`, `robots.txt`, `sitemap.xml`, tedy povolené výjimky.
+- Snímky po úklidu proti `.reference/`: Úvod, Ceník, V okolí, Kontakt 0 px na 1280 i 400, Fotky beze změny proti Tasku 5. `kontrola.py`: **OK: 0 chyb, 212 odkazů, web 5.3 MB**.
+
 ---
 
 ## Task 8: Vizuální porovnání se SSR
@@ -467,21 +475,20 @@ curl -sI https://chatavpekle.cz/neexistuje       # 404 s vlastní stránkou
 ## Předávka
 
 ```
-Pokračuj v projektu C:\work\projects\chatavpekle.cz podle plánu docs/plans/2026-10-13-staticky-web-github-pages.md (převod Quasar SSR webu Chata v Pekle na statické HTML na GitHub Pages, stejně jako Sunset-apartment.com).
+Pokračuj v projektu C:/work/projects/chatavpekle.cz podle plánu docs/plans/2026-10-13-staticky-web-github-pages.md (převod Quasar SSR webu Chata v Pekle na statické HTML na GitHub Pages, stejně jako Sunset-apartment.com).
 Skills: superpowers:executing-plans (plán má tasky s kontrolními body), superpowers:verification-before-completion (kontrola.py a snímky mají přesné očekávané výstupy).
 
-Stav (2026-10-13): Tasky 0–4 hotové. Hlavička (desktop + mobilní panel, reveal), patička, site/js/web.js a site/css/web.css jsou hotové. Úvod, Ceník, V okolí a Kontakt jsou na snímcích shodné se SSR na pixel, Fotky se liší jen v galerii. tools/kontrola.py hlásí 6 chyb (rozpis v „Provedeno“ u Tasku 4). Referenční snímky SSR jsou v .reference/ (mimo git). Texty alt u velkých fotek jsou návrhy, schvalují se v Tasku 6.
-Pokračuj Taskem 5 (galerie a lightbox). Otázka duplicit je rozhodnutá: 18 fotek, duplicity pryč, FOTEK_V_GALERII v tools/kontrola.py na 18 (Task 5, krok 1). Pak Task 6.
-V site/ je od commitu dbbd192 ověřovací soubor Google Search Console google554520753bcc9e67.html (dodal uživatel). Obsah neměnit, nemazat při úklidu v Tasku 7. Ověřit ho v Search Console až po převodu DNS (Task 12, krok 6).
+Stav (2026-10-13): Tasky 0–7 hotové. kontrola.py hlásí OK: 0 chyb, 212 odkazů. Galerie má 18 fotek (duplicity pryč) a lightbox ze Sunsetu prošel testem přes CDP (33 OK, chyby konzole 0). Titulky, popisy a alt texty uživatel schválil. Je hotový 404.html, robots.txt, sitemap.xml a README.md. Snímky proti .reference/ ukazují 0 px rozdílu u Úvodu, Ceníku, V okolí a Kontaktu. Fotky se liší jen o jednu řadu mřížky (18 místo 20 fotek), rozpis je v „Provedeno“ u Tasku 5. Repo zatím nemá remote (vznikne v Tasku 10), commity jsou jen lokálně.
+Pokračuj Taskem 8. Porovnání je z velké části hotové, zbývá přetok Ceníku na 400 px (scrollWidth 472, vada originálu, je i v SSR). Opravit ho, nebo zapsat, proč zůstává. Pak Task 9 (workflow ze Sunsetu beze změny, odkazy na web.css a web.js končí přesně web.css" a web.js" ve všech 5 stránkách, ověřeno grepem 2026-10-13; samotný sed z workflow zatím nikdo nespustil).
+Od Tasku 5 tools/snimky.mjs emuluje prefers-reduced-motion: reduce. Bez toho by fotky galerie pod ohybem zůstaly na snímku neviditelné. Referenční snímky SSR to neovlivňuje.
 
-Před prací spusť na pozadí náhled: python -m http.server -d site 8773 (z kořene repa). Místní SSR není potřeba až do Tasku 8; spouští se z C:\work\projects\chatavpekle.cz-stare příkazem PORT=3124 ./.node16/node-v16.20.2-win-x64/node.exe dist/ssr/index.js. Stroj má málo paměti, harness už jednou procesy na pozadí ukončil, takže je po práci zastav.
-Snímky: node tools/snimky.mjs http://localhost:8773 <scratchpad>/po 9334 (statická verze), pak pixelové porovnání s .reference/ přes PIL ImageChops (systémový Python). Měření prvků: node tools/mereni.mjs <url> <sirka> <soubor s JS výrazem>. Postup se <iframe> ze Sunsetu tu nefunguje kvůli fadeIn (Task 0, „Provedeno“, krok 8).
+Náhled spusť na pozadí: python -m http.server -d site 8773 (z kořene repa). Místní SSR na Task 8 nepotřebuješ, referenční snímky jsou v .reference/ (mimo git). Kdyby bylo potřeba měřit SSR, spouští se z C:/work/projects/chatavpekle.cz-stare příkazem PORT=3124 ./.node16/node-v16.20.2-win-x64/node.exe dist/ssr/index.js. Stroj má málo paměti, procesy po práci zastav.
+Snímky: node tools/snimky.mjs http://localhost:8773 <scratchpad>/po 9334, pak pixelové porovnání s .reference/ přes PIL ImageChops (systémový Python). Měření prvků: node tools/mereni.mjs <url> <sirka> <soubor s JS výrazem>. Test lightboxu (lb_test.mjs) byl jen ve scratchpadu. Popis kontrol je v „Provedeno“ u Tasku 5, kdyby se měnil web.js, napiš ho znovu.
 
 Pozor:
-- Kód ze Sunsetu se kopíruje a upravuje podle tasků: v Tasku 5 lightbox a animace galerie do web.js a web.css (swipe() už v web.js je) a tools/galerie_z_vue.py, v Tasku 9 .github/workflows/pages.yml. Karusel, počítadla ani záložky galerie nepřebírat.
-- Scoped CSS stránek a galerie je v site/css/komponenty.css se selektory [data-v-…]: atributy data-v v markupu musí zůstat.
-- Ceník na 400 px přetéká na 472 px (vada originálu, je i v SSR). Řešit v Tasku 8.
+- V site/ je ověřovací soubor Google Search Console google554520753bcc9e67.html. Obsah neměnit a nemazat, ověřit až po převodu DNS (Task 12, krok 6).
+- Scoped CSS je v site/css/komponenty.css se selektory [data-v-…]: atributy data-v v markupu musí zůstat.
 - Auto režim blokuje mazání repa a zakládání veřejného repa: příkazy dát uživateli přes ! na JEDEN řádek (Task 10).
-- Do plánu ani commitů nepiš interní hostitele a cesty Altisimy. Vzory: C:/work/archive/sunset-cisteni-historie/overeni.sh. Před commitem projít git grep --cached.
-- Otevřené otázky pro uživatele jsou v sekci „Otevřené“ (duplicity v galerii, texty popisů, starý server, 2 další A záznamy).
+- Do plánu ani commitů nepiš interní hostitele a cesty Altisimy. Vzory jsou v C:/work/archive/sunset-cisteni-historie/overeni.sh. Před commitem projdi git grep --cached.
+- Otevřené otázky pro uživatele: starý server 88.146.221.173 (Task 13) a 2 další A záznamy v DNS (Task 12). Otázky 1 a 2 jsou rozhodnuté.
 ```
