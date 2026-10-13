@@ -1,0 +1,52 @@
+/* Styly statického webu nad CSS Quasaru (app.css, komponenty.css). */
+
+/* Hlavička: obě varianty z Layout.vue jsou v HTML, přepínají je třídy Quasaru gt-sm / lt-md
+   (hranice 1024 px, dřív $q.screen.lt.md). Pod 1024 px hamburger a panel zleva (q-drawer). */
+.q-drawer {
+  visibility: hidden;
+  transition: transform 0.12s, visibility 0.12s !important;
+}
+body.menu-open .q-drawer {
+  transform: none;
+  visibility: visible;
+}
+.q-drawer__backdrop {
+  visibility: hidden;
+  background-color: transparent;
+  transition: background-color 0.12s, visibility 0.12s !important;
+}
+body.menu-open .q-drawer__backdrop {
+  visibility: visible;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* q-header reveal: web.js hlavičku při scrollu dolů schová třídou q-header--hidden (app.css) */
+@media (prefers-reduced-motion: no-preference) {
+  .q-header {
+    transition: transform 0.12s;
+  }
+}
+
+/* Hnědý proužek pod položkou menu při prokliku dojede na novou položku
+   (View Transitions mezi stránkami; prohlížeč bez podpory jen přepne stránku).
+   Jen desktop: na mobilu je menu po načtení stránky zavřené a proužek by odjel mimo obraz. */
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+    types: stranka;
+  }
+  .site-nav .q-tab--active .q-tab__indicator {
+    view-transition-name: nav-indikator;
+  }
+  /* Při přechodech uvnitř stránky (detail fotky) proužek nesmí vyskočit nad tmavé pozadí */
+  html.vt-lokal .site-nav .q-tab__indicator {
+    view-transition-name: none;
+  }
+  html:active-view-transition-type(stranka)::view-transition-group(root) {
+    animation: none;
+  }
+  ::view-transition-group(nav-indikator) {
+    animation-duration: 0.35s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}

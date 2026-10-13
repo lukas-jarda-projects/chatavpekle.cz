@@ -11,6 +11,7 @@
 **Stav:** Plán napsán 2026-10-13. Předem ověřeno: build SSR s Node 16 projde a místní SSR vrací všech 5 stránek (Výchozí stav).
 - Task 0: hotový 2026-10-13 (výsledky v „Provedeno“ u Tasku 0). Místní SSR na portu 3124 se po konci session musí spustit znovu (krok 7).
 - Task 1, Task 2: hotové 2026-10-13. Kontrola po Tasku 2: 16 chyb (rozpis v „Provedeno“ u Tasku 2).
+- Task 3: hotový 2026-10-13. Kontrola: 11 chyb, Úvod, V okolí a Kontakt jsou na snímcích shodné se SSR na pixel (rozpis v „Provedeno“ u Tasku 3).
 
 ---
 
@@ -208,8 +209,8 @@ Do `main()` za smazání skriptů přidat: ponechat jen první `<title>` (ostatn
 
 **Provedeno 2026-10-13:** převod prošel: `chunky` 6 souborů (`3–8.*.css`), 5× `stranka`, `css app.css`, `css komponenty.css`, stažené `img/chvp_foto01–05.jpg`, 5 fontů, favicony `favicon-16x16/32x32/96x96.png` + `favicon.ico`, `statics/app-logo-128x128.png` a `statics/000-flags-select.svg` (odkazuje na něj `komponenty.css`, Task 7 rozhodne, jestli zůstane). Web má 3,3 MB.
 - `kontrola.py`: **16 chyb**, 110 odkazů. 5× `2x <img> bez alt` (logo v hlavičce `img.logo` a velká fotka `img.top-image`; logo v patičce má `alt="logo"`), 4× stejná `meta description`, `galerie má 0 fotek, má 20`, `404.html: soubor chybí` a navíc proti očekávání 5× `v <nav> nejsou odkazy` (SSR dal mobilní hlavičku bez `<nav>`, vyřeší Task 3). `lang` i `<title>` prošly.
-- Snímky kostry (`tools/snimky.mjs` na portu 8773) proti `.reference/`: písma, barvy a text sedí na 1280 i 400 px. Rozdíly: na 1280 px mobilní hlavička a patička (Task 3) a na obou šířkách je obsah níž. Posun jsem jen odhadl ze snímku (asi 120 px na 1280 px), neměřil. Příčina je stejná jako u Sunsetu: SSR dává `q-page-container` natvrdo `style="padding-top:350px"` a `q-header` `style="height:112px"`, po hydrataci to Quasar přepočítá podle skutečné hlavičky. Opraví se v Tasku 3. Ceník na 400 px přetéká na 472 px i ve statické verzi.
-- Loga v hlavičce i patičce jsou vložená jako base64 SVG přímo v HTML.
+- Snímky kostry (`tools/snimky.mjs` na portu 8773) proti `.reference/`: písma, barvy a text sedí na 1280 i 400 px. Rozdíly: na 1280 px mobilní hlavička a patička (Task 3) a na obou šířkách je obsah níž. Posun jsem jen odhadl ze snímku (asi 120 px na 1280 px), neměřil. Příčina je stejná jako u Sunsetu: SSR dává `q-page-container` natvrdo `style="padding-top:350px"` a `q-header` `style="height:112px"`, po hydrataci to Quasar přepočítá podle skutečné hlavičky. Opraveno v Tasku 3: změřeno 112 px. Ceník na 400 px přetéká na 472 px i ve statické verzi.
+- Loga v hlavičce i patičce jsou vložená jako base64 SVG přímo v HTML. Task 3 je nahradil souborem `img/logo-chatavpekle.svg`.
 
 ---
 
@@ -233,6 +234,16 @@ Vzor: Sunset Task 3 a výsledek v `Sunset-apartment.com/site/` (markup hlavičky
 
 **Krok 5: Commit** „Sdílená hlavička, mobilní panel a patička“.
 
+**Provedeno 2026-10-13:**
+- Hlavičku a patičku přepsal jednorázový skript (neukládán) podle markupu z **hydratovaného** DOM SSR, vytaženého přes CDP na 1280 a 400 px. Třídy Quasaru proto sedí přesně a nebylo nutné je skládat z Pugu. Obě varianty jsou v HTML: desktop `.whole-menu.gt-sm`, mobil `.whole-menu.lt-md`. Patička je `<footer class="q-mt-lg" data-v-52e497e8>` se dvěma řádky `.lt-md` a `.gt-sm`. Třídy `gt-sm` a `lt-md` mají v `app.css` `display:none!important` podle šířky.
+- Desktop: `<nav aria-label="Hlavní menu" class="site-nav …">` (záložky, `q-tab--active` + `aria-current`). Mobil: `<nav aria-label="Menu" id="menu-panel" class="q-drawer …">` místo `<aside>`, backdrop i obě tlačítka mají `.js-menu`, hamburger nese `aria-expanded`. Atributy `role="tab"` a šipky `q-tabs__arrow` vypuštěny, nic nedělaly.
+- Logo: base64 SVG nahrazeno souborem `site/img/logo-chatavpekle.svg` (kopie `src/assets/logo-chatavpekle.svg`, SHA-256 shodné s vloženým). Všechna 4 loga mají `alt="Chata v Pekle"` (patička měla `alt="logo"`).
+- `q-page-container` má `padding-top:112px` a `q-page` `min-height:calc(100vh - 112px)`. Obojí je změřené na SSR po hydrataci, kde je `padding-top: 112px` a `min-height: 688px` při okně 800 px.
+- **`q-header reveal` zachováno.** Na SSR změřeno, že nad 250 px se hlavička při scrollu dolů schová (`q-header--hidden`, posun −123,2 px), při scrollu nahoru se vrátí a `padding-top` zůstává. `web.js` to dělá stejně: viditelná do 250 px, při pohybu nahoru a prvních 100 px po změně směru, s otevřeným menu vždy. Statická verze dala ve všech 13 měřených stavech stejný výsledek jako SSR.
+- `web.js`: třídy `gt-*`, menu (Esc, tlačítko „zavřít“, klik na pozadí, ověřeno), reveal, `swipe()` pro Task 5. `web.css`: panel a pozadí (`visibility` + přechod 0,12 s jako Quasar), přechod hlavičky, ukazatel menu přes View Transitions od 1024 px (`view-transition-name: nav-indikator` na 1280 ano, na 400 `none`).
+- Ověřeno snímky (`tools/snimky.mjs`, port 8773) proti `.reference/`: výšky všech 10 snímků se shodují. Úvod, V okolí a Kontakt jsou **0 px rozdílu** na obou šířkách. Fotky se liší jen v galerii (Task 5). Ceník má 993 px rozdílu: „Kč“ je posunuté doprava (viz Task 4). Otevřený panel na 400 px se od SSR liší 80 px, a to jen v obsahu Ceníku za ztmavením.
+- `kontrola.py`: **11 chyb**, 175 odkazů. 5× `<nav>` vyřešeno. Zbývá 5× img bez alt (`top-image`, Task 4/6), 4× stejná description, galerie 0 fotek a chybí 404.
+
 ---
 
 ## Task 4: Stránky Úvod, Ceník, V okolí, Kontakt
@@ -242,6 +253,7 @@ Obsah je v SSR celý, jen kontrola a úklid:
 - `transition appear … animated fadeIn` z Quasaru: SSR třídy `animated fadeIn` nevykreslí (0× v `/`, ověřeno 2026-10-13), efekt běžel jen po hydrataci. 1:1 se statickým HTML tedy znamená bez něj. Nic nedoplňovat.
 - odkazy V okolí a Kontaktu: `target="_blank"` doplnit o `rel="noopener"`,
 - `mailto:` a `tel:` beze změny,
+- **Ceník: mezera před „Kč“.** `prettify()` z Tasku 2 vložil konec řádku mezi `12 500` a `<span class="kc">`. Pug má `.cena 12 500` a hned `span.kc &nbsp;Kč`, takže mezera přibyla navíc k `&nbsp;` a „Kč“ je o pár px vpravo (993 px rozdílu proti `.reference/`, zjištěno v Tasku 3). Obě ceny zapsat na jeden řádek: `12 500<span class="kc" data-v-90ebed12="">&nbsp;Kč</span>`. Stejný jev hledat i u jiných inline prvků (snímky ukážou rozdíl).
 - scoped styly stránek (`.text-block`, `.cena`, `.kc`, seznamy) jsou v chuncích → `komponenty.css`. Selektory nesou `[data-v-…]`, takže atributy `data-v-…` v markupu MUSÍ zůstat. Ověřit vzhled proti `.reference/`.
 
 **Commit** „Stránky Úvod, Ceník, V okolí, Kontakt“.
@@ -297,7 +309,7 @@ Jedno pole `poschodi`, výstup `<div class="js-gallery …">` s `<a href="../sta
 
 ## Task 8: Vizuální porovnání se SSR
 
-Porovnat 5 stránek na 1280 a 400 px se `.reference/`: statickou verzi nasnímkovat `node tools/snimky.mjs http://localhost:8773 <scratchpad>/po 9334` a měřit prvky přes CDP (`Runtime.evaluate` s `getBoundingClientRect`) na obou originech. Iframe tu kvůli `fadeIn` nefunguje (Task 0, „Provedeno“, krok 8). Vyřešit přetok Ceníku na 400 px (tamtéž). Rozdíly opravit, nebo zapsat, proč zůstávají. Pak ukončit místní SSR (Task 0, krok 7).
+Porovnat 5 stránek na 1280 a 400 px se `.reference/`: statickou verzi nasnímkovat `node tools/snimky.mjs http://localhost:8773 <scratchpad>/po 9334` a měřit prvky přes CDP (`Runtime.evaluate` s `getBoundingClientRect`) na obou originech, skriptem `node tools/mereni.mjs <url> <sirka> <soubor s výrazem>` (vznikl v Tasku 3). Pixelový rozdíl snímků: PIL `ImageChops.difference` (systémový Python, venv PIL nemá). Iframe tu kvůli `fadeIn` nefunguje (Task 0, „Provedeno“, krok 8). Vyřešit přetok Ceníku na 400 px (tamtéž). Rozdíly opravit, nebo zapsat, proč zůstávají. Pak ukončit místní SSR (Task 0, krok 7).
 
 **Commit** „Vizuální doladění podle SSR“.
 
@@ -430,16 +442,14 @@ curl -sI https://chatavpekle.cz/neexistuje       # 404 s vlastní stránkou
 Pokračuj v projektu C:\work\projects\chatavpekle.cz podle plánu docs/plans/2026-10-13-staticky-web-github-pages.md (převod Quasar SSR webu Chata v Pekle na statické HTML na GitHub Pages, stejně jako Sunset-apartment.com).
 Skills: superpowers:executing-plans (plán má tasky s kontrolními body), superpowers:verification-before-completion (kontrola.py a snímky mají přesné očekávané výstupy).
 
-Stav (2026-10-13): Tasky 0, 1 a 2 hotové. Kostra site/ je převedená ze SSR (commit 42ec2aa), tools/kontrola.py hlásí 16 chyb (rozpis v „Provedeno“ u Tasku 2: alt u loga a top-image, stejné popisy, galerie 0 fotek, chybí 404.html, 5× chybí <nav>). Referenční snímky SSR jsou v .reference/ (mimo git).
-Pokračuj Taskem 3: hlavička s <nav> (desktopová varianta ručně z Layout.vue a LayoutFooter.vue ve starém repu C:\work\projects\chatavpekle.cz-stare, SSR dal jen mobilní), mobilní panel, patička, web.js a web.css ze Sunsetu. Opravit i pevné style="padding-top:350px" na q-page-container ze SSR (obsah je proti SSR níž, stejný jev jako u Sunsetu Task 3).
+Stav (2026-10-13): Tasky 0–3 hotové. Hlavička (desktop + mobilní panel, reveal), patička, site/js/web.js a site/css/web.css jsou hotové. Úvod, V okolí a Kontakt jsou na snímcích shodné se SSR na pixel. tools/kontrola.py hlásí 11 chyb (rozpis v „Provedeno“ u Tasku 3). Referenční snímky SSR jsou v .reference/ (mimo git).
+Pokračuj Taskem 4 (stránky Úvod, Ceník, V okolí, Kontakt). Zahrň opravu mezery před „Kč“ na Ceníku, popsanou přímo v Tasku 4 (prettify přidal mezeru, 993 px rozdílu proti referenci). Pak Task 5 (galerie).
 
-Před prací spusť na pozadí:
-- místní SSR (potřeba do Tasku 8): z C:\work\projects\chatavpekle.cz-stare příkaz PORT=3124 ./.node16/node-v16.20.2-win-x64/node.exe dist/ssr/index.js
-- náhled: python -m http.server -d site 8773 (z kořene repa)
-Snímky: node tools/snimky.mjs (reference ze SSR) nebo node tools/snimky.mjs http://localhost:8773 <scratchpad>/po 9334 (statická verze). Postup se <iframe> ze Sunsetu tu nefunguje kvůli fadeIn, viz Task 0 „Provedeno“, krok 8.
+Před prací spusť na pozadí náhled: python -m http.server -d site 8773 (z kořene repa). Místní SSR není potřeba až do Tasku 8; spouští se z C:\work\projects\chatavpekle.cz-stare příkazem PORT=3124 ./.node16/node-v16.20.2-win-x64/node.exe dist/ssr/index.js. Stroj má málo paměti, harness už jednou procesy na pozadí ukončil, takže je po práci zastav.
+Snímky: node tools/snimky.mjs http://localhost:8773 <scratchpad>/po 9334 (statická verze), pak pixelové porovnání s .reference/ přes PIL ImageChops (systémový Python). Měření prvků: node tools/mereni.mjs <url> <sirka> <soubor s JS výrazem>. Postup se <iframe> ze Sunsetu tu nefunguje kvůli fadeIn (Task 0, „Provedeno“, krok 8).
 
 Pozor:
-- Kód ze Sunsetu (site/js/web.js, site/css/web.css, tools/galerie_z_vue.py, .github/workflows/pages.yml) se kopíruje a upravuje podle tasků; nepřebírat karusel, počítadla ani záložky galerie.
+- Kód ze Sunsetu se kopíruje a upravuje podle tasků: v Tasku 5 lightbox a animace galerie do web.js a web.css (swipe() už v web.js je) a tools/galerie_z_vue.py, v Tasku 9 .github/workflows/pages.yml. Karusel, počítadla ani záložky galerie nepřebírat.
 - Scoped CSS stránek a galerie je v site/css/komponenty.css se selektory [data-v-…]: atributy data-v v markupu musí zůstat.
 - Ceník na 400 px přetéká na 472 px (vada originálu, je i v SSR). Řešit v Tasku 8.
 - Auto režim blokuje mazání repa a zakládání veřejného repa: příkazy dát uživateli přes ! na JEDEN řádek (Task 10).
