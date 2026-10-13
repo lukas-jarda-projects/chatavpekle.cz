@@ -18,7 +18,9 @@
 - Task 7: hotový 2026-10-13. Kontrola: 0 chyb, snímky beze změny (rozpis v „Provedeno“ u Tasku 7).
 - Task 8: hotový 2026-10-13. Přetok Ceníku a Úvodu na úzkém displeji opraven, kontrola 0 chyb (rozpis v „Provedeno“ u Tasku 8).
 - Task 9: hotový 2026-10-13. Workflow ze Sunsetu beze změny, krok se `sed` ověřen během nad kopií `site/` (rozpis v „Provedeno“ u Tasku 9).
-- Task 10: kroky 1–4 hotové 2026-10-13. Nové veřejné repo, Pages běží na náhledu, odkazy 0 chyb. **Zbývá krok 5**, test na telefonu (uživatel).
+- Task 10: hotový 2026-10-13. Nové veřejné repo, Pages běží na náhledu, odkazy 0 chyb, test na telefonu OK (uživatel).
+- Task 11: hotový 2026-10-13. Doména ověřena v organizaci, TXT v DNS zůstává.
+- Task 12: kroky 1–5 hotové 2026-10-13. **Web běží na https://chatavpekle.cz/** (GitHub Pages, certifikát, Enforce HTTPS). Zbývá krok 6: Ověřit v Search Console.
 
 ---
 
@@ -64,7 +66,7 @@
 1. **Duplicitní fotky v galerii** (Task 5): 1:1 znamená 20 náhledů včetně dvou opakovaných. Navrhnout odstranění duplicit (18 fotek). Výchozí stav do odpovědi je 1:1 (20). **Rozhodnuto uživatelem 2026-10-13: duplicity vyhodit, 18 fotek.**
 2. **Texty `title` a `meta description`** pro 5 stránek (Task 6): navrhnout a nechat schválit. Spolu s nimi schválit `alt` velkých fotek (návrhy jsou už v HTML, výčet v „Provedeno“ u Tasku 4). **Rozhodnuto uživatelem 2026-10-13: schváleny všechny návrhy (výčet v „Provedeno“ u Tasku 6).**
 3. **Kdo provozoval starý server na `88.146.221.173`** a jestli na něm (nebo v Jenkinsu Altisimy) zbyla služba nebo job webu, který by měl někdo zrušit (Task 13). U Sunsetu to byl Robert z Altisimy.
-4. **Co jsou ty „+ 2 A záznamy“** v DNS u Websupportu (Task 12). Zjistit v administraci, rozhodnout s uživatelem.
+4. **Co jsou ty „+ 2 A záznamy“** v DNS u Websupportu (Task 12). Zjistit v administraci, rozhodnout s uživatelem. **Vyřešeno 2026-10-13:** jsou to jen A apexu a A `www` (oba `88.146.221.173`), žádné jiné záznamy v zóně nejsou (výpis u Tasku 12, krok 1). Není co rozhodovat, oba se nahradí podle kroku 2.
 
 ---
 
@@ -430,6 +432,8 @@ Ověřit: běh prošel, `https://lukas-jarda-projects.github.io/chatavpekle.cz/`
 - Náhled: `/`, `/cenik/`, `/fotky/`, `/okoli/`, `/kontakt/` 200, `/neexistuje` 404 s vlastní stránkou („Stránka nenalezena – Chata v Pekle“), `/cenik` 301 na `/cenik/`, `robots.txt`, `sitemap.xml` a ověřovací soubor Google 200 (obsah beze změny). Stránky odkazují na `web.css?v=8f5642b` a `web.js?v=8f5642b`.
 - Interní odkazy živého náhledu (`href`, `src` a `url()` v CSS, skript ve scratchpadu): 217 odkazů, 44 unikátních URL, **0 chyb**.
 
+**Provedeno 2026-10-13 (krok 5):** uživatel otestoval náhled na telefonu: menu, panel, galerie, swipe i pinch v detailu fungují.
+
 ---
 
 ## Task 11: Ověření domény v organizaci
@@ -444,6 +448,11 @@ nslookup -type=TXT _github-pages-challenge-lukas-jarda-projects.chatavpekle.cz n
 
 Pak na GitHubu **Verify**. TXT musí v DNS zůstat. Past ze Sunsetu: wildcard `*` záznam by dotaz na TXT „zodpověděl“ apexem. Tady wildcard na `neco.chatavpekle.cz` 2026-10-13 nic nevrátil.
 
+**Provedeno 2026-10-13 (přes Chrome, na pokyn uživatele):**
+- Krok 1: doména `chatavpekle.cz` přidána do organizace. GitHub vydal TXT na `_github-pages-challenge-lukas-jarda-projects.chatavpekle.cz` s hodnotou `ab44bd7296a7bf4a11e82018533a8b` (přečteno zvětšeným výřezem).
+- Krok 2: TXT u Websupportu vytvořen (TTL 300). Administrace je teď pod značkou Active24, DNS služby je na `https://admin.websupport.cz/cs/dns/2072776/records` (adresa `/cs/dns/service/2072776` vrací 404). NS domény jsou `ns1.websupport.cz`, `ns2.websupport.cz` a `ns3.websupport.eu`. Hned po uložení `ns1` hlásil Non-existent domain, záznam se propisuje se zpožděním. Na `ns1` se objevil v 11:14:44, po 10 dotazech à 20 s, tedy asi do 4 minut. Wildcard `neco.chatavpekle.cz` TXT nevrací.
+- **Verify prošel 2026-10-13:** „Successfully verified chatavpekle.cz“, v organizaci jsou ověřené `sunset-apartment.com` a `chatavpekle.cz`. TXT v DNS zůstává.
+
 ---
 
 ## Task 12: Převod domény (DNS u Websupportu)
@@ -452,7 +461,9 @@ Web teď neběží, takže převod nikomu nevypne funkční web a čas převodu 
 
 **Krok 1:** V administraci vypsat všechny DNS záznamy a zapsat sem. **Otevřená otázka 4:** co jsou 2 další A záznamy. `www` je dnes A (ne CNAME), nahradí se CNAME.
 
-**Krok 2: Nové záznamy** (IP ověřit v aktuální dokumentaci GitHubu „Managing a custom domain for your GitHub Pages site“, než se zadají):
+**Krok 1 provedeno 2026-10-13:** v administraci jsou jen 2 záznamy, `chatavpekle.cz` A `88.146.221.173` a `www.chatavpekle.cz` A `88.146.221.173`, oba TTL 300 (plus TXT z Tasku 11). MX, TXT ani další záznamy nejsou. **Otevřená otázka 4 vyřešena:** „88.146.221.173 + 2 A záznamů“ v přehledu služby označuje právě tyto dva záznamy, žádné další A záznamy neexistují.
+
+**Krok 2: Nové záznamy** (IP ověřeny 2026-10-13 v dokumentaci GitHubu, shodují se s tabulkou; IP ověřit v aktuální dokumentaci GitHubu „Managing a custom domain for your GitHub Pages site“, než se zadají):
 
 | záznam | typ | hodnota |
 |---|---|---|
@@ -467,6 +478,14 @@ Web teď neběží, takže převod nikomu nevypne funkční web a čas převodu 
 | `www` | CNAME | `lukas-jarda-projects.github.io.` |
 
 Starý A `88.146.221.173` (apex i `www`) smazat.
+
+**Krok 2 provedeno 2026-10-13 (přes Chrome, se svolením uživatele):** apex A `88.146.221.173` přepsán na `185.199.108.153`, přidány A `.109`, `.110` a `.111` a 4× AAAA `2606:50c0:800{0–3}::153`, všechny s TTL 300. A `www` smazán a místo něj CNAME `www` → `lukas-jarda-projects.github.io` (zadáno bez tečky na konci, TTL 300). V 11:43:28 `ns1.websupport.cz` vracel všechny 4 A i 4 AAAA, CNAME `www` ještě ne. Past administrace: formulář je po `navigate` ještě asi 5 s neaktivní. Když se vyplní a uloží dřív, uložení tiše neproběhne (2× A a 3× AAAA se tak ztratily a musely se zadat znovu). Po každém uložení je proto potřeba zkontrolovat zelenou hlášku „DNS záznam byl úspěšně vytvořen“.
+
+**Krok 3 provedeno 2026-10-13:** `cname` nastaven, API vrací `cname: chatavpekle.cz`, `protected_domain_state: verified`, certifikát zatím žádný.
+
+**Krok 4 provedeno 2026-10-13:** CNAME `www` byl na `ns1` vidět v 11:43:45 a certifikát měl stav `new`, v 11:44:16 už `approved` pro `chatavpekle.cz` i `www.chatavpekle.cz` (platnost do 2027-01-11). `https_enforced: true`, `html_url: https://chatavpekle.cz/`.
+
+**Krok 5 provedeno 2026-10-13 v 11:44:** `nslookup` přes 8.8.8.8 vrací 4× A a 4× AAAA GitHubu. `https://chatavpekle.cz/` 200 `Server: GitHub.com`, `https://www.chatavpekle.cz/` 301 na `https://chatavpekle.cz/`, `/cenik` 301 na `/cenik/`, `http://` 301 na https, `/neexistuje` 404 s vlastní stránkou („Stránka nenalezena – Chata v Pekle“). `/cenik/`, `/fotky/`, `/okoli/`, `/kontakt/`, `robots.txt` a `sitemap.xml` vrací 200 a `sitemap.xml` uvádí adresy `https://chatavpekle.cz/…`. Stránka 404 nemá žádné externí zdroje (CSS je vložené), odkazuje jen na `/`.
 
 **Krok 3:** Custom domain na repu (s Actions workflow se soubor `CNAME` nepoužívá):
 
@@ -489,6 +508,7 @@ curl -sI https://chatavpekle.cz/neexistuje       # 404 s vlastní stránkou
 
 **Krok 6:** Pokud je doména v Google Search Console nebo Bing Webmaster (meta `google-site-verification` a `msvalidate.01` v hlavě to naznačují), odeslat `sitemap.xml`. Neověřeno, jestli ověření ještě platí.
 - **Google Search Console, ověření souborem (zadal uživatel 2026-10-13):** soubor `site/google554520753bcc9e67.html` je v repu od commitu „Ověřovací soubor Google Search Console“ a po nasazení bude na `https://chatavpekle.cz/google554520753bcc9e67.html`. Před převodem DNS ho Google nenajde, protože doména míří na mrtvý server. Po kroku 5 ověřit `curl -s https://chatavpekle.cz/google554520753bcc9e67.html` (musí vrátit `google-site-verification: google554520753bcc9e67.html`) a teprve pak v Search Console kliknout na **Ověřit**.
+- **2026-10-13 v 11:44:** `curl` ověřovacího souboru na ostré doméně vrací `google-site-verification: google554520753bcc9e67.html`. Kliknutí na Ověřit v Search Console zatím neproběhlo.
 
 ---
 
