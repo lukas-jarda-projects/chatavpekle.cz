@@ -14,6 +14,7 @@
 - Task 3: hotový 2026-10-13. Kontrola: 11 chyb, Úvod, V okolí a Kontakt jsou na snímcích shodné se SSR na pixel (rozpis v „Provedeno“ u Tasku 3).
 - Task 4: hotový 2026-10-13. Kontrola: 6 chyb, všechny stránky kromě galerie Fotek shodné se SSR na pixel (rozpis v „Provedeno“ u Tasku 4).
 - Task 5: hotový 2026-10-13. Kontrola: 5 chyb, test lightboxu 33 OK (rozpis v „Provedeno“ u Tasku 5).
+- Task 6: hotový 2026-10-13. Kontrola: **0 chyb** (rozpis v „Provedeno“ u Tasku 6).
 
 ---
 
@@ -57,7 +58,7 @@
 ## Otevřené (zeptat se uživatele, až na ně dojde)
 
 1. **Duplicitní fotky v galerii** (Task 5): 1:1 znamená 20 náhledů včetně dvou opakovaných. Navrhnout odstranění duplicit (18 fotek). Výchozí stav do odpovědi je 1:1 (20). **Rozhodnuto uživatelem 2026-10-13: duplicity vyhodit, 18 fotek.**
-2. **Texty `title` a `meta description`** pro 5 stránek (Task 6): navrhnout a nechat schválit. Spolu s nimi schválit `alt` velkých fotek (návrhy jsou už v HTML, výčet v „Provedeno“ u Tasku 4).
+2. **Texty `title` a `meta description`** pro 5 stránek (Task 6): navrhnout a nechat schválit. Spolu s nimi schválit `alt` velkých fotek (návrhy jsou už v HTML, výčet v „Provedeno“ u Tasku 4). **Rozhodnuto uživatelem 2026-10-13: schváleny všechny návrhy (výčet v „Provedeno“ u Tasku 6).**
 3. **Kdo provozoval starý server na `88.146.221.173`** a jestli na něm (nebo v Jenkinsu Altisimy) zbyla služba nebo job webu, který by měl někdo zrušit (Task 13). U Sunsetu to byl Robert z Altisimy.
 4. **Co jsou ty „+ 2 A záznamy“** v DNS u Websupportu (Task 12). Zjistit v administraci, rozhodnout s uživatelem.
 
@@ -310,6 +311,14 @@ Jedno pole `poschodi`, výstup `<div class="js-gallery …">` s `<a href="../sta
 - `alt` u log (hlavička, patička) a zbývajících obrázků, až kontrola hlásí 0 chyb.
 
 `python tools/kontrola.py` = `OK: 0 chyb, …`. Výsledek zapsat sem.
+
+**Provedeno 2026-10-13:**
+- `site/404.html` je **samostatná stránka s vloženým stylem** jako u Sunsetu (Sunset nakonec `/css/…` nepoužil), takže nemá žádné cesty kromě `href="/"` a funguje i na náhledu v podsložce. Barvy z `quasar.variables.styl` (`$primary` #637016, `$secondary` #8C4227). Původní `Error404.vue` byl anglický bez obrázku („Sorry, nothing here…“), text je česky podle Sunsetu.
+- favicony už v `site/statics/icons/` a v hlavičkách byly (převod z Tasku 2), kontrola je bere jako odkazy.
+- `robots.txt`, `sitemap.xml` s 5 adresami `https://chatavpekle.cz/…`.
+- **Otevřená otázka 2 rozhodnuta uživatelem 2026-10-13: „Schválit vše“.** Titulky: „Chata v Pekle – pronájem chaty v Jizerských horách“ (Úvod), „Ceník / Fotky / V okolí / Kontakt – Chata v Pekle“. Popisy podle návrhu (texty jsou v `<meta name="description">` stránek). Schváleny i `alt` velkých fotek z Tasku 4 a „Chata v Pekle, fotka 1–18“ v galerii. Loga `alt` už měla, kontrola žádný obrázek bez `alt` nehlásí.
+- `kontrola.py`: **OK: 0 chyb, 212 odkazů, web 5.3 MB**.
+- `window.__Q_META__` ve stránkách nese pořád starý titulek. Bez Vue je to mrtvý skript, patří do úklidu v Tasku 7.
 
 **Commit** „404, robots, sitemap, popisy stránek“.
 
