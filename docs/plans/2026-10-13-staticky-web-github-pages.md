@@ -22,7 +22,7 @@
 - Task 11: hotový 2026-10-13. Doména ověřena v organizaci, TXT v DNS zůstává.
 - Task 12: hotový 2026-10-13. **Web běží na https://chatavpekle.cz/** (GitHub Pages, certifikát, Enforce HTTPS). Search Console je ověřený a sitemap odeslaná. Stav sitemap „Nelze načíst“ zkontrolovat později (rozpis u kroku 6).
 - Úpravy vzhledu po převodu: hotové 2026-10-13 (sekce „Úpravy po převodu“).
-- Task 13: čeká. Rozhodnutí uživatele 2026-10-13: staré repo `C:/work/projects/chatavpekle.cz-stare` smazat **nejdřív 2026-10-20** (týden bez problémů). Otevřená otázka 3 (starý server a job v Jenkinsu) trvá.
+- Task 13: čeká. Rozhodnutí uživatele 2026-10-13: staré repo `C:/work/projects/chatavpekle.cz-stare` smazat **nejdřív 2026-10-20** (týden bez problémů). Otázka 3 (starý server a job v Jenkinsu) vyřešena: vypnutí domluví uživatel s Altisimou sám.
 
 ---
 
@@ -67,7 +67,7 @@
 
 1. **Duplicitní fotky v galerii** (Task 5): 1:1 znamená 20 náhledů včetně dvou opakovaných. Navrhnout odstranění duplicit (18 fotek). Výchozí stav do odpovědi je 1:1 (20). **Rozhodnuto uživatelem 2026-10-13: duplicity vyhodit, 18 fotek.**
 2. **Texty `title` a `meta description`** pro 5 stránek (Task 6): navrhnout a nechat schválit. Spolu s nimi schválit `alt` velkých fotek (návrhy jsou už v HTML, výčet v „Provedeno“ u Tasku 4). **Rozhodnuto uživatelem 2026-10-13: schváleny všechny návrhy (výčet v „Provedeno“ u Tasku 6).**
-3. **Kdo provozoval starý server na `88.146.221.173`** a jestli na něm (nebo v Jenkinsu Altisimy) zbyla služba nebo job webu, který by měl někdo zrušit (Task 13). U Sunsetu to byl Robert z Altisimy.
+3. **Kdo provozoval starý server na `88.146.221.173`** a jestli na něm (nebo v Jenkinsu Altisimy) zbyla služba nebo job webu, který by měl někdo zrušit (Task 13). U Sunsetu to byl Robert z Altisimy. **Rozhodnuto uživatelem 2026-10-13: vypnutí domluví s Altisimou sám.** Pro Task 13 tím otázka padá.
 4. **Co jsou ty „+ 2 A záznamy“** v DNS u Websupportu (Task 12). Zjistit v administraci, rozhodnout s uživatelem. **Vyřešeno 2026-10-13:** jsou to jen A apexu a A `www` (oba `88.146.221.173`), žádné jiné záznamy v zóně nejsou (výpis u Tasku 12, krok 1). Není co rozhodovat, oba se nahradí podle kroku 2.
 
 ---
@@ -515,12 +515,13 @@ curl -sI https://chatavpekle.cz/neexistuje       # 404 s vlastní stránkou
 - **2026-10-13 v 11:44:** `curl` ověřovacího souboru na ostré doméně vrací `google-site-verification: google554520753bcc9e67.html`. ~~Kliknutí na Ověřit v Search Console zatím neproběhlo.~~ (Uzavřeno bodem níže: služba se po přidání ověřila sama.)
 - **Provedeno 2026-10-13 (přes Chrome, na pokyn uživatele):** v účtu Search Console uživatele nebyla žádná služba. Po přidání služby typu předpona URL `https://chatavpekle.cz/` hlásil Google „Vlastnictví ověřeno automaticky“, a to metodami Soubor HTML a Značka HTML. Ověřovací soubor i meta `google-site-verification` proto musí v `site/` zůstat. Odeslán `sitemap.xml` („Soubor Sitemap byl úspěšně odeslán“). Hned potom Search Console u sitemap ukazoval stav **„Nelze načíst“**, přestože `curl` vrací 200, `Content-Type: application/xml`, platné XML s 5× `<loc>` a `robots.txt` na sitemap odkazuje. Tento stav bývá po odeslání dočasný, ale ověřené to není. **Zkontrolovat** v Search Console → Soubory Sitemap. Bing Webmaster (`msvalidate.01`) se neřešil.
 - **Kontrola 2026-10-13 mezi 12:18 a 12:20:** stránka Ověření vlastnictví uvádí „Jste ověřeným vlastníkem“ (Soubor HTML i Značka HTML „Úspěšně ověřeno“). Sitemap má pořád stav „Nelze načíst“, poslední čtení prázdné. `curl` s user-agentem Googlebota vrací 200 `application/xml` a obsah je správný (5 adres `https://chatavpekle.cz/…`), na straně webu tedy chybu nevidím.
+- **Kontrola 2026-10-13 ve 13:38:** stav pořád „Nelze načíst“, poslední čtení prázdné, objevené stránky 0. Sitemap jako Googlebot: 200, `Content-Type: application/xml`, platné XML (parsováno), 5 adres. `robots.txt` povoluje vše a odkazuje na sitemap. Prázdné „Poslední čtení“ znamená, že ji Google zatím vůbec nestáhl. U čerstvě přidané služby to tak často bývá, doba do stažení se v řádu dní nedá ovlivnit (neověřeno, opírá se jen o obecnou zkušenost). **Další kontrola nejdřív 2026-10-16.** Když bude stav stejný, sitemap smazat a odeslat znovu a zkusit Kontrolu URL → Otestovat živou URL na `https://chatavpekle.cz/`. Služba je typu předpona URL: odkaz `resource_id=sc-domain:chatavpekle.cz` vrací „K této službě nemáte přístup“, správně je `https://search.google.com/u/0/search-console/sitemaps?resource_id=https://chatavpekle.cz/`.
 
 ---
 
 ## Task 13: Úklid
 
-- **Otevřená otázka 3:** domluvit vypnutí starého serveru a jobu v Jenkinsu, pokud existují,
+- ~~**Otevřená otázka 3:** domluvit vypnutí starého serveru a jobu v Jenkinsu, pokud existují,~~ Domluví uživatel s Altisimou sám (rozhodnutí 2026-10-13).
 - po týdnu bez problémů smazat `C:/work/projects/chatavpekle.cz-stare` (včetně `.node16/`). Zálohy v `C:/work/archive/` ponechat,
 - odebrat tokenu `gh` scope `delete_repo` (`gh auth refresh -h github.com -r delete_repo`), protože chatavpekle.cz byl poslední důvod ho mít,
 - plán označit jako dokončený, do `Stav` hash posledního commitu a datum převodu.
@@ -558,10 +559,9 @@ Skills: superpowers:verification-before-completion (úklid má ověřitelné vý
 Stav (2026-10-13): Tasky 0–12 hotové. Web běží na https://chatavpekle.cz/ (GitHub Pages z repa lukas-jarda-projects/chatavpekle.cz, větev master, certifikát do 2027-01-11, Enforce HTTPS). www je CNAME, http i www přesměrují 301 na https://chatavpekle.cz/, /neexistuje vrací vlastní 404. Doména je ověřená v organizaci, TXT _github-pages-challenge-lukas-jarda-projects musí v DNS zůstat. Search Console je ověřený v účtu uživatele (soubor HTML i meta značka) a sitemap.xml odeslaná. Rozpis je v „Provedeno“ u Tasků 10–12. Po převodu upraven vzhled: zoom místo světlého hoveru v galerii, pomalé prolnutí horní fotky mezi stránkami (1,5 s, bez View Transitions, menu během něj klikatelné; vložený skript v 5 stránkách musí zůstat shodný), preloader horních fotek a jednotný easing animací (sekce „Úpravy po převodu“).
 
 Další kroky:
-1. Search Console → Soubory Sitemap: hned po odeslání i při kontrole ve 12:20 ukazoval stav „Nelze načíst“, přestože sitemap vrací 200 a platné XML (i pro user-agent Googlebota). Zkontrolovat, jestli se stav změnil. Když ne, zjistit příčinu (Task 12, krok 6).
+1. Search Console → Soubory Sitemap (služba je typu předpona URL: https://search.google.com/u/0/search-console/sitemaps?resource_id=https://chatavpekle.cz/, odkaz se sc-domain hlásí „nemáte přístup“). Ve 13:38 pořád „Nelze načíst“, poslední čtení prázdné, tedy Google ji ještě nestáhl. Sitemap je v pořádku (200, application/xml, platné XML, 5 adres). Znovu zkontrolovat nejdřív 2026-10-16. Když bude stav stejný, sitemap smazat a odeslat znovu a zkusit Kontrolu URL → Otestovat živou URL (Task 12, krok 6).
 2. Task 13, nejdřív 2026-10-20 (rozhodnutí uživatele: týden bez problémů): smazat C:/work/projects/chatavpekle.cz-stare (včetně .node16/). Zálohy v C:/work/archive/ ponechat. Pak plán označit jako dokončený (do Stav hash a datum převodu 2026-10-13).
-3. Scope delete_repo u tokenu gh: uživatel 2026-10-13 spustil `gh auth refresh -h github.com -r delete_repo`, ale nepotvrdil kód na https://github.com/login/device a příkaz skončil „context deadline exceeded“. Ve 13:19 `gh auth status` stále ukazuje delete_repo. Spustit znovu přes `!` a kód potvrdit včas.
-4. Otevřená otázka 3: starý server 88.146.221.173 a job v Jenkinsu Altisimy (webhook zanikl se smazáním starého repa). Zeptat se uživatele.
+3. Scope delete_repo u tokenu gh: 13:38 `gh auth status` stále ukazuje delete_repo. Odebrat může jen uživatel přes `! gh auth refresh -h github.com -r delete_repo` a kód na https://github.com/login/device potvrdit včas (první pokus skončil „context deadline exceeded“). Pak ověřit `gh auth status`.
 
 Pozor:
 - V site/ je ověřovací soubor Google Search Console google554520753bcc9e67.html a v hlavičkách 5 stránek (ne 404) meta google-site-verification. Na obojím stojí ověření, nemazat ani neměnit.
@@ -572,5 +572,5 @@ Pozor:
 - Lokální náhled: python -m http.server -d site 8773 (na pozadí, po práci zastavit, stroj má málo paměti). Kontrola: python tools/kontrola.py (OK: 0 chyb, 212 odkazů).
 - Prolnutí horní fotky a dojezd proužku menu dělá VLOŽENÝ SKRIPT hned za <img class="top-image"> v 5 stránkách (značka „// Přechod z předchozí stránky“), bez View Transitions (ty zamrazily stránku, menu během prolnutí nešlo kliknout). Skript měň ve všech 5 stránkách naráz, tools/kontrola.py hlídá shodu. Rozpis v „Úpravy po převodu“, 3. kolo.
 - Testy v synchronním Playwrightu: po kliku čekat přes page.wait_for_timeout / wait_for_url, ne time.sleep (nepumpuje události, page.url ukazuje starou stránku).
-- Otevřená otázka pro uživatele: jen otázka 3 (starý server 88.146.221.173 a job v Jenkinsu, Task 13). Otázky 1, 2 a 4 jsou vyřešené.
+- Otevřené otázky pro uživatele: žádné. Otázku 3 (starý server 88.146.221.173 a job v Jenkinsu) si 2026-10-13 vzal uživatel: vypnutí domluví s Altisimou sám.
 ```
