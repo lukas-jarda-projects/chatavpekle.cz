@@ -310,7 +310,7 @@ Jedno pole `poschodi`, výstup `<div class="js-gallery …">` s `<a href="../sta
 
 - odstranit zbytky SSR, které bez Vue nic nedělají (prázdné `q-drawer` obaly, `aria-*` stavy Quasaru, které už neodpovídají), ale ne třídy, na které je navázané CSS,
 - `README.md`: co je web, jak náhled (`python -m http.server -d site 8773`), jak kontrola, kde se upravují ceny (`site/cenik/index.html`), odkaz na tento plán,
-- `site/` nesmí obsahovat soubory, na které nic neodkazuje (porovnat výpis souborů s odkazy z kontroly), kromě `robots.txt`, `sitemap.xml`, `404.html` a favicon.
+- `site/` nesmí obsahovat soubory, na které nic neodkazuje (porovnat výpis souborů s odkazy z kontroly), kromě `robots.txt`, `sitemap.xml`, `404.html`, favicon a `google554520753bcc9e67.html` (ověřovací soubor Google Search Console, dodal uživatel 2026-10-13, obsah se nesmí měnit).
 
 **Commit** „Úklid markupu, README“.
 
@@ -433,6 +433,7 @@ curl -sI https://chatavpekle.cz/neexistuje       # 404 s vlastní stránkou
 ```
 
 **Krok 6:** Pokud je doména v Google Search Console nebo Bing Webmaster (meta `google-site-verification` a `msvalidate.01` v hlavě to naznačují), odeslat `sitemap.xml`. Neověřeno, jestli ověření ještě platí.
+- **Google Search Console, ověření souborem (zadal uživatel 2026-10-13):** soubor `site/google554520753bcc9e67.html` je v repu od commitu „Ověřovací soubor Google Search Console“ a po nasazení bude na `https://chatavpekle.cz/google554520753bcc9e67.html`. Před převodem DNS ho Google nenajde, protože doména míří na mrtvý server. Po kroku 5 ověřit `curl -s https://chatavpekle.cz/google554520753bcc9e67.html` (musí vrátit `google-site-verification: google554520753bcc9e67.html`) a teprve pak v Search Console kliknout na **Ověřit**.
 
 ---
 
