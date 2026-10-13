@@ -418,6 +418,11 @@ Ověřit: běh prošel, `https://lukas-jarda-projects.github.io/chatavpekle.cz/`
 
 **Krok 5:** Uživatel ověří na telefonu menu, panel, galerii, swipe a pinch v detailu. Výsledek zapsat sem.
 
+**Provedeno 2026-10-13 (kroky 1–2):**
+- Krok 1: staré repo má **1 webhook**, a to Jenkins Altisimy (událost `push`, aktivní, založen 10. 6. 2022, poslední odpověď žádná). Deploy keys 0, issues 0, PR 0, Pages nezapnuté (404). Webhook zanikne se smazáním repa. Job v Jenkinsu na straně Altisimy tím nezanikne, patří k otevřené otázce 3. Hostitel se do plánu nepíše.
+- Mirror `C:/work/archive/chatavpekle.cz-pred-smazanim.git`: `master` = `8a799dd uprava ceny`, 15 commitů, shodný s `git ls-remote` GitHubu. GitHub má navíc ref `refs/remotes/origin/master` (`88ace31 transition`), mirror ho obsahuje taky. Bundle `bundle verify` = okay.
+- Krok 2: autor i committer všech 16 commitů je jen `LukasWana <qwanap@gmail.com>`. Vzory z `overeni.sh` nad celou historií: 0 a 0. Remote žádný, 57 trackovaných souborů, `.git` 5,7 MB, `kontrola.py` OK. Osobní údaje v plánu: jméno vlastníka domény je i na veřejné stránce Kontakt, zmínky o Altisimě mají stejný rozsah jako veřejný plán Sunsetu.
+
 ---
 
 ## Task 11: Ověření domény v organizaci
