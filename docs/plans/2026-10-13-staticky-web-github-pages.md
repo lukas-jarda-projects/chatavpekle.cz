@@ -13,6 +13,7 @@
 - Task 1, Task 2: hotové 2026-10-13. Kontrola po Tasku 2: 16 chyb (rozpis v „Provedeno“ u Tasku 2).
 - Task 3: hotový 2026-10-13. Kontrola: 11 chyb, Úvod, V okolí a Kontakt jsou na snímcích shodné se SSR na pixel (rozpis v „Provedeno“ u Tasku 3).
 - Task 4: hotový 2026-10-13. Kontrola: 6 chyb, všechny stránky kromě galerie Fotek shodné se SSR na pixel (rozpis v „Provedeno“ u Tasku 4).
+- Task 5: hotový 2026-10-13. Kontrola: 5 chyb, test lightboxu 33 OK (rozpis v „Provedeno“ u Tasku 5).
 
 ---
 
@@ -289,6 +290,14 @@ Jedno pole `poschodi`, výstup `<div class="js-gallery …">` s `<a href="../sta
 **Krok 4:** Ověřit headless přes CDP (postup Sunset, „Úprava: animace menu a galerie“): otevření, listování šipkami, klávesami a swipem, smyčka přes začátek, zavření, pinch, dvojí ťuknutí, chyby konzole 0. Skripty `vt_test.mjs` a `zoom_test.mjs` v repu Sunsetu nejsou (byly jen ve scratchpadu), napsat znovu podle popisu.
 
 **Krok 5: Commit** „Fotogalerie a lightbox“.
+
+**Provedeno 2026-10-13:**
+- `tools/galerie_z_vue.py`: 18 fotek (duplicity vynechány `dict.fromkeys`), `alt` „Chata v Pekle, fotka 1–18“, fotky zkopírovány do `site/statics/galerie/`. Vloženo do `site/fotky/index.html` místo SSR mřížky i se zástupcem `<!-- -->` po TinyBoxu. Kontejner, `margin-left:-20px` a `data-v-e940f3e8` převzaty.
+- `web.css`: náhledy jako `q-img` (`inline-block`, `vertical-align: middle`, `object-fit: cover`), dál sekce Lightbox, Animace galerie a Detail ze Sunsetu (bez ukazatele záložek). `web.js`: `klid`, postupné objevení fotek (zjednodušeno, bez `odhal()` pro záložky), lightbox a zoom ze Sunsetu beze změny.
+- `tools/snimky.mjs` emuluje `prefers-reduced-motion: reduce`. Bez toho zůstanou fotky pod ohybem na snímku celé stránky neviditelné (objevují se až při scrollu). Ostatní stránky dál 0 px rozdílu.
+- Snímky Fotek: rozdíl výšky −320 px na 1280 a −120 px na 400 = jedna řada mřížky (18 místo 20 fotek). Pořadí fotek sedí. Geometrie první řady je shodná na pixel (ohraničení obsahu stejné), liší se jen vyhlazení obrázku `img` proti `background-image` (průměr 0,24 z 255, max 61).
+- Test lightboxu přes CDP (`lb_test.mjs` ve scratchpadu, na 1280 a 400 px): otevření, tlačítko Další, šipky, smyčka přes začátek i konec, swipe oběma směry, pinch (scale 4), swipe v přiblížení nelistuje, Esc zruší zoom a zavře, dvojí ťuknutí přiblíží a oddálí, křížek a klik na pozadí zavřou. **33 OK, 0 chyb, chyby konzole 0.**
+- `kontrola.py`: **5 chyb** (4× stejná description, chybí `404.html`; vše Task 6).
 
 ---
 

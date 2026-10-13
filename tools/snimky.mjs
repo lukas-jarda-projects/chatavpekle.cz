@@ -45,6 +45,8 @@ const cdp = (method, params = {}) => new Promise((r) => {
 try {
   for (const sirka of SIRKY) {
     await cdp("Emulation.setDeviceMetricsOverride", { width: sirka, height: VYSKA_OKNA, deviceScaleFactor: 1, mobile: false });
+    // Bez animací: galerie by jinak pod ohybem zůstala neviditelná (fotky se objevují až při scrollu)
+    await cdp("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "reduce" }] });
     for (const [jmeno, cesta] of Object.entries(STRANKY)) {
       await cdp("Network.setCacheDisabled", { cacheDisabled: true });
       await cdp("Page.navigate", { url: ZDROJ + cesta });

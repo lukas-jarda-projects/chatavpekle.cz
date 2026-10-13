@@ -19,7 +19,7 @@ POVINNE = {
     "kontakt/index.html": ["chata.v.pekle@seznam.cz", "+420 737 288 911", "Peklo č.p.120"],
 }
 # 1:1 s fotky.vue včetně 2 duplicit; po rozhodnutí o duplicitách případně 18
-FOTEK_V_GALERII = 20
+FOTEK_V_GALERII = 18
 POVOLENE_HOSTY_SKRIPTU = set()
 URL_V_CSS = re.compile(r"url\(\s*[\"']?([^\"')]+)[\"']?\s*\)")
 
