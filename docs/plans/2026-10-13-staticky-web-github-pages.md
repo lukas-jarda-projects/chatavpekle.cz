@@ -523,7 +523,7 @@ curl -sI https://chatavpekle.cz/neexistuje       # 404 s vlastní stránkou
 
 - ~~**Otevřená otázka 3:** domluvit vypnutí starého serveru a jobu v Jenkinsu, pokud existují,~~ Domluví uživatel s Altisimou sám (rozhodnutí 2026-10-13).
 - po týdnu bez problémů smazat `C:/work/projects/chatavpekle.cz-stare` (včetně `.node16/`). Zálohy v `C:/work/archive/` ponechat,
-- odebrat tokenu `gh` scope `delete_repo` (`gh auth refresh -h github.com -r delete_repo`), protože chatavpekle.cz byl poslední důvod ho mít,
+- ~~odebrat tokenu `gh` scope `delete_repo` (`gh auth refresh -h github.com -r delete_repo`), protože chatavpekle.cz byl poslední důvod ho mít~~ Hotovo 2026-10-13: uživatel spustil refresh a potvrdil kód, `gh auth status` ukazuje scopes `admin:public_key`, `gist`, `read:org`, `repo` (bez `delete_repo`),
 - plán označit jako dokončený, do `Stav` hash posledního commitu a datum převodu.
 
 ---
@@ -561,7 +561,6 @@ Stav (2026-10-13): Tasky 0–12 hotové. Web běží na https://chatavpekle.cz/ 
 Další kroky:
 1. Search Console → Soubory Sitemap (služba je typu předpona URL: https://search.google.com/u/0/search-console/sitemaps?resource_id=https://chatavpekle.cz/, odkaz se sc-domain hlásí „nemáte přístup“). Ve 13:38 pořád „Nelze načíst“, poslední čtení prázdné, tedy Google ji ještě nestáhl. Sitemap je v pořádku (200, application/xml, platné XML, 5 adres). Znovu zkontrolovat nejdřív 2026-10-16. Když bude stav stejný, sitemap smazat a odeslat znovu a zkusit Kontrolu URL → Otestovat živou URL (Task 12, krok 6).
 2. Task 13, nejdřív 2026-10-20 (rozhodnutí uživatele: týden bez problémů): smazat C:/work/projects/chatavpekle.cz-stare (včetně .node16/). Zálohy v C:/work/archive/ ponechat. Pak plán označit jako dokončený (do Stav hash a datum převodu 2026-10-13).
-3. Scope delete_repo u tokenu gh: 13:38 `gh auth status` stále ukazuje delete_repo. Odebrat může jen uživatel přes `! gh auth refresh -h github.com -r delete_repo` a kód na https://github.com/login/device potvrdit včas (první pokus skončil „context deadline exceeded“). Pak ověřit `gh auth status`.
 
 Pozor:
 - V site/ je ověřovací soubor Google Search Console google554520753bcc9e67.html a v hlavičkách 5 stránek (ne 404) meta google-site-verification. Na obojím stojí ověření, nemazat ani neměnit.
