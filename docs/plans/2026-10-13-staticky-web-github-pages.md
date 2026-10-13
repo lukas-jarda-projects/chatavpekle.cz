@@ -16,6 +16,7 @@
 - Task 5: hotový 2026-10-13. Kontrola: 5 chyb, test lightboxu 33 OK (rozpis v „Provedeno“ u Tasku 5).
 - Task 6: hotový 2026-10-13. Kontrola: **0 chyb** (rozpis v „Provedeno“ u Tasku 6).
 - Task 7: hotový 2026-10-13. Kontrola: 0 chyb, snímky beze změny (rozpis v „Provedeno“ u Tasku 7).
+- Task 8: hotový 2026-10-13. Přetok Ceníku a Úvodu na úzkém displeji opraven, kontrola 0 chyb (rozpis v „Provedeno“ u Tasku 8).
 
 ---
 
@@ -347,6 +348,14 @@ Jedno pole `poschodi`, výstup `<div class="js-gallery …">` s `<a href="../sta
 Porovnat 5 stránek na 1280 a 400 px se `.reference/`: statickou verzi nasnímkovat `node tools/snimky.mjs http://localhost:8773 <scratchpad>/po 9334` a měřit prvky přes CDP (`Runtime.evaluate` s `getBoundingClientRect`) na obou originech, skriptem `node tools/mereni.mjs <url> <sirka> <soubor s výrazem>` (vznikl v Tasku 3). Pixelový rozdíl snímků: PIL `ImageChops.difference` (systémový Python, venv PIL nemá). Iframe tu kvůli `fadeIn` nefunguje (Task 0, „Provedeno“, krok 8). Vyřešit přetok Ceníku na 400 px (tamtéž). Rozdíly opravit, nebo zapsat, proč zůstávají. Pak ukončit místní SSR (Task 0, krok 7).
 
 **Commit** „Vizuální doladění podle SSR“.
+
+**Provedeno 2026-10-13:**
+- **Přetok Ceníku opraven** (vada originálu, je i v SSR). Příčina: scoped `.text-block[data-v-90ebed12]{margin-left:5rem}` má vyšší specificitu než mobilní `.text-block{margin:0;width:90vw!important}` z `app.css` (`max-width:580px`), takže blok široký 90vw začínal na x = 112 a přetékal na 472 px. Stejná vada na Úvodu (`.text-block[data-v-85ab2346]{margin-left:0.5rem}`, x = 40): přetok 40 − 0,1 × šířka, tedy o 4 px na 360 px a o 1 px na 393 px. Přetok zjištěn průchodem šířek, ne snímky (ty mají jen 1280 a 400).
+- Oprava: na konci `site/css/komponenty.css` jedno pravidlo s komentářem, `@media screen and (max-width:580px)` vynuluje `margin-left` u obou bloků. Text pak začíná na x = 32 jako na V okolí a Kontaktu. Nad 580 px beze změny (Ceník x = 183 na 581 px, Úvod x = 47).
+- `scrollWidth` = šířka okna na všech 5 stránkách při 320, 360, 393, 580, 581, 600, 768, 900, 920 a 1024 px.
+- Snímky proti `.reference/`: Úvod 1280, Ceník 1280, V okolí a Kontakt na obou šířkách 0 px. Úvod 400 a Ceník 400 se liší jen vodorovným posunem textu o 8 a 80 px (po posunu oblasti rozdílu 0 px). Fotky jako v Tasku 5 (−320 / −120 px, jedna řada mřížky).
+- **Vědomě ponecháno:** v originálním chunku pro Kontakt je neplatný dotaz `@media screen and (max-width:919x)`. Prohlížeč ho ignoruje a na žádné šířce nic nepřetéká, takže se nemění (1:1).
+- `kontrola.py`: **OK: 0 chyb, 212 odkazů, web 5.3 MB**. Místní SSR v této session neběželo (ověřeno výpisem procesů `node.exe`), nebylo co ukončit.
 
 ---
 
