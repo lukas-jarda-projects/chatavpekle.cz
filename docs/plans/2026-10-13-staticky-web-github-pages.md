@@ -423,6 +423,12 @@ Ověřit: běh prošel, `https://lukas-jarda-projects.github.io/chatavpekle.cz/`
 - Mirror `C:/work/archive/chatavpekle.cz-pred-smazanim.git`: `master` = `8a799dd uprava ceny`, 15 commitů, shodný s `git ls-remote` GitHubu. GitHub má navíc ref `refs/remotes/origin/master` (`88ace31 transition`), mirror ho obsahuje taky. Bundle `bundle verify` = okay.
 - Krok 2: autor i committer všech 16 commitů je jen `LukasWana <qwanap@gmail.com>`. Vzory z `overeni.sh` nad celou historií: 0 a 0. Remote žádný, 57 trackovaných souborů, `.git` 5,7 MB, `kontrola.py` OK. Osobní údaje v plánu: jméno vlastníka domény je i na veřejné stránce Kontakt, zmínky o Altisimě mají stejný rozsah jako veřejný plán Sunsetu.
 
+**Provedeno 2026-10-13 (kroky 3–4):**
+- Krok 3: uživatel smazal staré repo (API pak 404) a založil nové veřejné `lukas-jarda-projects/chatavpekle.cz`, `master` = `8f5642b`.
+- Krok 4: Pages zapnuté (`build_type` workflow, `https://lukas-jarda-projects.github.io/chatavpekle.cz/`). Běh z pushe `38372514882` se v `gh run list` objevil až po několika sekundách, takže se spustil i ručně a běžely dva: push i `workflow_dispatch` `38372528189`, oba success (23 s a 37 s). První běh tedy uspěl, i když Pages zapnuly až během něj.
+- Náhled: `/`, `/cenik/`, `/fotky/`, `/okoli/`, `/kontakt/` 200, `/neexistuje` 404 s vlastní stránkou („Stránka nenalezena – Chata v Pekle“), `/cenik` 301 na `/cenik/`, `robots.txt`, `sitemap.xml` a ověřovací soubor Google 200 (obsah beze změny). Stránky odkazují na `web.css?v=8f5642b` a `web.js?v=8f5642b`.
+- Interní odkazy živého náhledu (`href`, `src` a `url()` v CSS, skript ve scratchpadu): 217 odkazů, 44 unikátních URL, **0 chyb**.
+
 ---
 
 ## Task 11: Ověření domény v organizaci
