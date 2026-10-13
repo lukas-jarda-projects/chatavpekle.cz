@@ -17,6 +17,7 @@
 - Task 6: hotový 2026-10-13. Kontrola: **0 chyb** (rozpis v „Provedeno“ u Tasku 6).
 - Task 7: hotový 2026-10-13. Kontrola: 0 chyb, snímky beze změny (rozpis v „Provedeno“ u Tasku 7).
 - Task 8: hotový 2026-10-13. Přetok Ceníku a Úvodu na úzkém displeji opraven, kontrola 0 chyb (rozpis v „Provedeno“ u Tasku 8).
+- Task 9: hotový 2026-10-13. Workflow ze Sunsetu beze změny, krok se `sed` ověřen během nad kopií `site/` (rozpis v „Provedeno“ u Tasku 9).
 
 ---
 
@@ -364,6 +365,13 @@ Porovnat 5 stránek na 1280 a 400 px se `.reference/`: statickou verzi nasnímko
 `.github/workflows/pages.yml` zkopírovat ze Sunsetu beze změny (větev `master`, krok „Kontrola webu“, krok „Verze CSS a JS“ přidává `?v=<commit>` k `web.css` a `web.js`). Nová stránka musí mít odkazy končící přesně `web.css"` a `web.js"`, jinak je `sed` nechytí. Ověřit `yaml.safe_load`.
 
 **Commit** „Workflow GitHub Pages“.
+
+**Provedeno 2026-10-13:**
+- `.github/workflows/pages.yml` zkopírován ze Sunsetu, `cmp` shodný. `yaml.safe_load` projde, kroky: checkout, Kontrola webu, Verze CSS a JS, configure-pages, upload-pages-artifact, deploy-pages.
+- **Krok „Verze CSS a JS“ poprvé skutečně spuštěn** (příkaz vytažený z YAML, Git Bash, kopie `site/` ve scratchpadu, `GITHUB_SHA=abcdef1234567890`): každá z 5 stránek má 2 odkazy `web.css?v=abcdef1"` / `web.js?v=abcdef1"` a 0 bez verze, `diff -r` = 10 změněných řádků. `404.html` a ověřovací soubor Google nemají co měnit (404 je samostatná stránka s vloženým stylem, Task 6).
+- **Neplatné první měření:** Python `subprocess.run(["bash", …])` na Windows spustil WSL `C:\Windows\System32\bash.exe`, protože CreateProcess hledá v `System32` dřív než v `PATH`. WSL nepřevzal `GITHUB_SHA`, takže vyšlo `web.js?v="`. Šlo o vadu testu, ne workflow. Opakovat s cestou z `shutil.which("bash")`.
+- `tools/kontrola.py` poběží na runneru: jen stdlib (`re`, `sys`, `html.parser`, `pathlib`, `urllib.parse`), čtení vždy `encoding="utf-8"`, žádné windowsové cesty.
+- Vzory z `overeni.sh` (obsah i jména souborů) nad celou historií repa: 0 a 0 nálezů.
 
 ---
 
