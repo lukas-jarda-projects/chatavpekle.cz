@@ -480,13 +480,7 @@ Web teď neběží, takže převod nikomu nevypne funkční web a čas převodu 
 
 Starý A `88.146.221.173` (apex i `www`) smazat.
 
-**Krok 2 provedeno 2026-10-13 (přes Chrome, se svolením uživatele):** apex A `88.146.221.173` přepsán na `185.199.108.153`, přidány A `.109`, `.110` a `.111` a 4× AAAA `2606:50c0:800{0–3}::153`, všechny s TTL 300. A `www` smazán a místo něj CNAME `www` → `lukas-jarda-projects.github.io` (zadáno bez tečky na konci, TTL 300). V 11:43:28 `ns1.websupport.cz` vracel všechny 4 A i 4 AAAA, CNAME `www` ještě ne. Past administrace: formulář je po `navigate` ještě asi 5 s neaktivní. Když se vyplní a uloží dřív, uložení tiše neproběhne (2× A a 3× AAAA se tak ztratily a musely se zadat znovu). Po každém uložení je proto potřeba zkontrolovat zelenou hlášku „DNS záznam byl úspěšně vytvořen“.
-
-**Krok 3 provedeno 2026-10-13:** `cname` nastaven, API vrací `cname: chatavpekle.cz`, `protected_domain_state: verified`, certifikát zatím žádný.
-
-**Krok 4 provedeno 2026-10-13:** CNAME `www` byl na `ns1` vidět v 11:43:45 a certifikát měl stav `new`, v 11:44:16 už `approved` pro `chatavpekle.cz` i `www.chatavpekle.cz` (platnost do 2027-01-11). `https_enforced: true`, `html_url: https://chatavpekle.cz/`.
-
-**Krok 5 provedeno 2026-10-13 v 11:44:** `nslookup` přes 8.8.8.8 vrací 4× A a 4× AAAA GitHubu. `https://chatavpekle.cz/` 200 `Server: GitHub.com`, `https://www.chatavpekle.cz/` 301 na `https://chatavpekle.cz/`, `/cenik` 301 na `/cenik/`, `http://` 301 na https, `/neexistuje` 404 s vlastní stránkou („Stránka nenalezena – Chata v Pekle“). `/cenik/`, `/fotky/`, `/okoli/`, `/kontakt/`, `robots.txt` a `sitemap.xml` vrací 200 a `sitemap.xml` uvádí adresy `https://chatavpekle.cz/…`. Stránka 404 nemá žádné externí zdroje (CSS je vložené), odkazuje jen na `/`.
+**Krok 2 provedeno 2026-10-13 (přes Chrome, se svolením uživatele):** apex A `88.146.221.173` přepsán na `185.199.108.153`, přidány A `.109`, `.110` a `.111` a 4× AAAA `2606:50c0:800{0–3}::153`, všechny s TTL 300. A `www` smazán a místo něj CNAME `www` → `lukas-jarda-projects.github.io` (zadáno bez tečky na konci, TTL 300). V 11:43:28 `ns1.websupport.cz` vracel všechny 4 A i 4 AAAA, CNAME `www` ještě ne. **Past administrace:** některá uložení tiše neproběhla. Ztratily se tak 2× A a 3× AAAA a musely se zadat znovu. Neuložilo se vždy, když se formulář přes Chrome vyplnil a hned odeslal do ~4 s po načtení stránky. Uložilo se, když od načtení uplynulo ~5 s a mezi vyplněním a kliknutím byla pauza. Přesnou příčinu jsem neověřil. Po každém uložení je proto potřeba zkontrolovat zelenou hlášku „DNS záznam byl úspěšně vytvořen“.
 
 **Krok 3:** Custom domain na repu (s Actions workflow se soubor `CNAME` nepoužívá):
 
@@ -507,10 +501,19 @@ curl -sI http://chatavpekle.cz/                  # 301 na https
 curl -sI https://chatavpekle.cz/neexistuje       # 404 s vlastní stránkou
 ```
 
+**Krok 3 provedeno 2026-10-13:** `cname` nastaven, API vrací `cname: chatavpekle.cz`, `protected_domain_state: verified`, certifikát zatím žádný.
+
+**Krok 4 provedeno 2026-10-13:** CNAME `www` byl na `ns1` vidět v 11:43:45 a certifikát měl stav `new`, v 11:44:16 už `approved` pro `chatavpekle.cz` i `www.chatavpekle.cz` (platnost do 2027-01-11). `https_enforced: true`, `html_url: https://chatavpekle.cz/`.
+
+**Krok 5 provedeno 2026-10-13 v 11:44:** `nslookup` přes 8.8.8.8 vrací 4× A a 4× AAAA GitHubu. `https://chatavpekle.cz/` 200 `Server: GitHub.com`, `https://www.chatavpekle.cz/` 301 na `https://chatavpekle.cz/`, `/cenik` 301 na `/cenik/`, `http://` 301 na https, `/neexistuje` 404 s vlastní stránkou („Stránka nenalezena – Chata v Pekle“). `/cenik/`, `/fotky/`, `/okoli/`, `/kontakt/`, `robots.txt` a `sitemap.xml` vrací 200 a `sitemap.xml` uvádí adresy `https://chatavpekle.cz/…`. Stránka 404 nemá žádné externí zdroje (CSS je vložené), odkazuje jen na `/`.
+
+**Kontrola 2026-10-13 ve 12:18:** `ns1.websupport.cz`, 8.8.8.8 i 1.1.1.1 vracejí 4× A, 4× AAAA, CNAME `www` a TXT výzvy. Stará IP `88.146.221.173` nikde nezůstala. Přesměrování platí i pro `http://www.` (301 na `https://chatavpekle.cz/`). Interní odkazy 5 stránek na ostré doméně (`href`, `src` a `url()` v CSS, skript ve scratchpadu) dávají 44 unikátních URL, **0 chyb**, stejně jako na náhledu.
+
 **Krok 6:** Pokud je doména v Google Search Console nebo Bing Webmaster (meta `google-site-verification` a `msvalidate.01` v hlavě to naznačují), odeslat `sitemap.xml`. Neověřeno, jestli ověření ještě platí.
 - **Google Search Console, ověření souborem (zadal uživatel 2026-10-13):** soubor `site/google554520753bcc9e67.html` je v repu od commitu „Ověřovací soubor Google Search Console“ a po nasazení bude na `https://chatavpekle.cz/google554520753bcc9e67.html`. Před převodem DNS ho Google nenajde, protože doména míří na mrtvý server. Po kroku 5 ověřit `curl -s https://chatavpekle.cz/google554520753bcc9e67.html` (musí vrátit `google-site-verification: google554520753bcc9e67.html`) a teprve pak v Search Console kliknout na **Ověřit**.
-- **2026-10-13 v 11:44:** `curl` ověřovacího souboru na ostré doméně vrací `google-site-verification: google554520753bcc9e67.html`. Kliknutí na Ověřit v Search Console zatím neproběhlo.
+- **2026-10-13 v 11:44:** `curl` ověřovacího souboru na ostré doméně vrací `google-site-verification: google554520753bcc9e67.html`. ~~Kliknutí na Ověřit v Search Console zatím neproběhlo.~~ (Uzavřeno bodem níže: služba se po přidání ověřila sama.)
 - **Provedeno 2026-10-13 (přes Chrome, na pokyn uživatele):** v účtu Search Console uživatele nebyla žádná služba. Po přidání služby typu předpona URL `https://chatavpekle.cz/` hlásil Google „Vlastnictví ověřeno automaticky“, a to metodami Soubor HTML a Značka HTML. Ověřovací soubor i meta `google-site-verification` proto musí v `site/` zůstat. Odeslán `sitemap.xml` („Soubor Sitemap byl úspěšně odeslán“). Hned potom Search Console u sitemap ukazoval stav **„Nelze načíst“**, přestože `curl` vrací 200, `Content-Type: application/xml`, platné XML s 5× `<loc>` a `robots.txt` na sitemap odkazuje. Tento stav bývá po odeslání dočasný, ale ověřené to není. **Zkontrolovat** v Search Console → Soubory Sitemap. Bing Webmaster (`msvalidate.01`) se neřešil.
+- **Kontrola 2026-10-13 mezi 12:18 a 12:20:** stránka Ověření vlastnictví uvádí „Jste ověřeným vlastníkem“ (Soubor HTML i Značka HTML „Úspěšně ověřeno“). Sitemap má pořád stav „Nelze načíst“, poslední čtení prázdné. `curl` s user-agentem Googlebota vrací 200 `application/xml` a obsah je správný (5 adres `https://chatavpekle.cz/…`), na straně webu tedy chybu nevidím.
 
 ---
 
@@ -532,14 +535,14 @@ Skills: superpowers:verification-before-completion (úklid má ověřitelné vý
 Stav (2026-10-13): Tasky 0–12 hotové. Web běží na https://chatavpekle.cz/ (GitHub Pages z repa lukas-jarda-projects/chatavpekle.cz, větev master, certifikát do 2027-01-11, Enforce HTTPS). www je CNAME, http i www přesměrují 301 na https://chatavpekle.cz/, /neexistuje vrací vlastní 404. Doména je ověřená v organizaci, TXT _github-pages-challenge-lukas-jarda-projects musí v DNS zůstat. Search Console je ověřený v účtu uživatele (soubor HTML i meta značka) a sitemap.xml odeslaná. Rozpis je v „Provedeno“ u Tasků 10–12.
 
 Další kroky:
-1. Search Console → Soubory Sitemap: hned po odeslání ukazoval stav „Nelze načíst“, přestože sitemap vrací 200 a platné XML. Zkontrolovat, jestli se stav změnil. Když ne, zjistit příčinu (Task 12, krok 6).
+1. Search Console → Soubory Sitemap: hned po odeslání i při kontrole ve 12:20 ukazoval stav „Nelze načíst“, přestože sitemap vrací 200 a platné XML (i pro user-agent Googlebota). Zkontrolovat, jestli se stav změnil. Když ne, zjistit příčinu (Task 12, krok 6).
 2. Task 13, nejdřív 2026-10-20 (rozhodnutí uživatele: týden bez problémů): smazat C:/work/projects/chatavpekle.cz-stare (včetně .node16/). Zálohy v C:/work/archive/ ponechat. Pak plán označit jako dokončený (do Stav hash a datum převodu 2026-10-13).
 3. Scope delete_repo u tokenu gh: příkaz `gh auth refresh -h github.com -r delete_repo` spouští uživatel přes `!` (interaktivní přihlášení). Zeptat se, jestli už to udělal (`gh auth status` ukazuje scopes).
 4. Otevřená otázka 3: starý server 88.146.221.173 a job v Jenkinsu Altisimy (webhook zanikl se smazáním starého repa). Zeptat se uživatele.
 
 Pozor:
 - V site/ je ověřovací soubor Google Search Console google554520753bcc9e67.html a v hlavičkách 5 stránek (ne 404) meta google-site-verification. Na obojím stojí ověření, nemazat ani neměnit.
-- DNS u Websupportu (administrace Active24, https://admin.websupport.cz/cs/dns/2072776/records): formulář je po načtení asi 5 s neaktivní a dřívější uložení tiše neproběhne. Po každém uložení kontrolovat zelenou hlášku.
+- DNS u Websupportu (administrace Active24, https://admin.websupport.cz/cs/dns/2072776/records): některá uložení přes Chrome tiše neproběhla, když se formulář vyplnil a odeslal hned po načtení (příčina neověřená, rozpis v Tasku 12 kroku 2). Po každém uložení kontrolovat zelenou hlášku.
 - Scoped CSS je v site/css/komponenty.css se selektory [data-v-…]: atributy data-v v markupu musí zůstat.
 - Do plánu ani commitů nepiš interní hostitele a cesty Altisimy (repo je teď VEŘEJNÉ). Vzory jsou v C:/work/archive/sunset-cisteni-historie/overeni.sh. Před každým commitem projdi git grep a historii.
 - Python subprocess.run(["bash", …]) na Windows spustí WSL bash ze System32, který nepřevezme proměnné prostředí. Používej shutil.which("bash").
