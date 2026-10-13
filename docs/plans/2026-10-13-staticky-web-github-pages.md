@@ -21,6 +21,7 @@
 - Task 10: hotový 2026-10-13. Nové veřejné repo, Pages běží na náhledu, odkazy 0 chyb, test na telefonu OK (uživatel).
 - Task 11: hotový 2026-10-13. Doména ověřena v organizaci, TXT v DNS zůstává.
 - Task 12: hotový 2026-10-13. **Web běží na https://chatavpekle.cz/** (GitHub Pages, certifikát, Enforce HTTPS). Search Console je ověřený a sitemap odeslaná. Stav sitemap „Nelze načíst“ zkontrolovat později (rozpis u kroku 6).
+- Úpravy vzhledu po převodu: hotové 2026-10-13 (sekce „Úpravy po převodu“).
 - Task 13: čeká. Rozhodnutí uživatele 2026-10-13: staré repo `C:/work/projects/chatavpekle.cz-stare` smazat **nejdřív 2026-10-20** (týden bez problémů). Otevřená otázka 3 (starý server a job v Jenkinsu) trvá.
 
 ---
@@ -526,13 +527,24 @@ curl -sI https://chatavpekle.cz/neexistuje       # 404 s vlastní stránkou
 
 ---
 
+## Úpravy po převodu
+
+Zadání uživatele 2026-10-13, vše v `site/css/web.css`:
+- **Hover v galerii:** světlé pozadí odkazu (`a:hover{background-color:#ece8e1}` z `app.css`) vypnuté pro `.gallery-item`, místo něj se fotka přiblíží (`scale(1.05)`, 0,6 s; i pro `:focus-visible`, s `prefers-reduced-motion` bez animace).
+- **Horní fotka při přechodu na jinou stránku:** pomalé prolnutí původní fotky do nové (View Transitions, `view-transition-name: top-foto`, 1,8 s, ease-in-out). Zbytek stránky se přepne hned. Skupina se nehýbe, fotka zůstává na místě nové stránky (všech 5 horních fotek má 1798 × 814). Přechody mezi stránkami jsou nově zapnuté na všech šířkách, proužek menu dál jen na desktopu.
+- Hlavička je vlastní vrstva přechodu (`hlavicka`, přepne se hned). Bez toho fotka během přechodu překryla logo, které do ní přesahuje, a logo naskočilo až po 1,8 s (zjištěno na snímcích).
+- Při detailu fotky (`html.vt-lokal`) jsou obě jména vypnutá, aby lokální přechod netrval 1,8 s a hlavička nevyskočila nad tmavé pozadí.
+- Ověřeno 2026-10-13 headless Chromem (Playwright) na místním náhledu: hover dá průhledné pozadí a `matrix(1.05…)`; snímky přechodu Okolí → Ceník na 1400 px i 400 px ukazují prolnutí a logo nad fotkou; lightbox se otevře i zavře, chyby stránky 0. `tools/kontrola.py`: 0 chyb, 212 odkazů. Prohlížeč bez View Transitions (např. starší Firefox) stránku jen přepne.
+
+---
+
 ## Předávka
 
 ```
 Pokračuj v projektu C:/work/projects/chatavpekle.cz podle plánu docs/plans/2026-10-13-staticky-web-github-pages.md (převod Quasar SSR webu Chata v Pekle na statické HTML na GitHub Pages, stejně jako Sunset-apartment.com).
 Skills: superpowers:verification-before-completion (úklid má ověřitelné výstupy, viz Task 13).
 
-Stav (2026-10-13): Tasky 0–12 hotové. Web běží na https://chatavpekle.cz/ (GitHub Pages z repa lukas-jarda-projects/chatavpekle.cz, větev master, certifikát do 2027-01-11, Enforce HTTPS). www je CNAME, http i www přesměrují 301 na https://chatavpekle.cz/, /neexistuje vrací vlastní 404. Doména je ověřená v organizaci, TXT _github-pages-challenge-lukas-jarda-projects musí v DNS zůstat. Search Console je ověřený v účtu uživatele (soubor HTML i meta značka) a sitemap.xml odeslaná. Rozpis je v „Provedeno“ u Tasků 10–12.
+Stav (2026-10-13): Tasky 0–12 hotové. Web běží na https://chatavpekle.cz/ (GitHub Pages z repa lukas-jarda-projects/chatavpekle.cz, větev master, certifikát do 2027-01-11, Enforce HTTPS). www je CNAME, http i www přesměrují 301 na https://chatavpekle.cz/, /neexistuje vrací vlastní 404. Doména je ověřená v organizaci, TXT _github-pages-challenge-lukas-jarda-projects musí v DNS zůstat. Search Console je ověřený v účtu uživatele (soubor HTML i meta značka) a sitemap.xml odeslaná. Rozpis je v „Provedeno“ u Tasků 10–12. Po převodu upraven vzhled: zoom místo světlého hoveru v galerii a pomalé prolnutí horní fotky mezi stránkami (sekce „Úpravy po převodu“).
 
 Další kroky:
 1. Search Console → Soubory Sitemap: hned po odeslání i při kontrole ve 12:20 ukazoval stav „Nelze načíst“, přestože sitemap vrací 200 a platné XML (i pro user-agent Googlebota). Zkontrolovat, jestli se stav změnil. Když ne, zjistit příčinu (Task 12, krok 6).
