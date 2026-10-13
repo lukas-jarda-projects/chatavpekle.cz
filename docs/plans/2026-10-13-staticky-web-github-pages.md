@@ -560,7 +560,7 @@ Stav (2026-10-13): Tasky 0–12 hotové. Web běží na https://chatavpekle.cz/ 
 Další kroky:
 1. Search Console → Soubory Sitemap: hned po odeslání i při kontrole ve 12:20 ukazoval stav „Nelze načíst“, přestože sitemap vrací 200 a platné XML (i pro user-agent Googlebota). Zkontrolovat, jestli se stav změnil. Když ne, zjistit příčinu (Task 12, krok 6).
 2. Task 13, nejdřív 2026-10-20 (rozhodnutí uživatele: týden bez problémů): smazat C:/work/projects/chatavpekle.cz-stare (včetně .node16/). Zálohy v C:/work/archive/ ponechat. Pak plán označit jako dokončený (do Stav hash a datum převodu 2026-10-13).
-3. Scope delete_repo u tokenu gh: příkaz `gh auth refresh -h github.com -r delete_repo` spouští uživatel přes `!` (interaktivní přihlášení). Zeptat se, jestli už to udělal (`gh auth status` ukazuje scopes).
+3. Scope delete_repo u tokenu gh: uživatel 2026-10-13 spustil `gh auth refresh -h github.com -r delete_repo`, ale nepotvrdil kód na https://github.com/login/device a příkaz skončil „context deadline exceeded“. Ve 13:19 `gh auth status` stále ukazuje delete_repo. Spustit znovu přes `!` a kód potvrdit včas.
 4. Otevřená otázka 3: starý server 88.146.221.173 a job v Jenkinsu Altisimy (webhook zanikl se smazáním starého repa). Zeptat se uživatele.
 
 Pozor:
@@ -570,5 +570,7 @@ Pozor:
 - Do plánu ani commitů nepiš interní hostitele a cesty Altisimy (repo je teď VEŘEJNÉ). Vzory jsou v C:/work/archive/sunset-cisteni-historie/overeni.sh. Před každým commitem projdi git grep a historii.
 - Python subprocess.run(["bash", …]) na Windows spustí WSL bash ze System32, který nepřevezme proměnné prostředí. Používej shutil.which("bash").
 - Lokální náhled: python -m http.server -d site 8773 (na pozadí, po práci zastavit, stroj má málo paměti). Kontrola: python tools/kontrola.py (OK: 0 chyb, 212 odkazů).
+- Prolnutí horní fotky a dojezd proužku menu dělá VLOŽENÝ SKRIPT hned za <img class="top-image"> v 5 stránkách (značka „// Přechod z předchozí stránky“), bez View Transitions (ty zamrazily stránku, menu během prolnutí nešlo kliknout). Skript měň ve všech 5 stránkách naráz, tools/kontrola.py hlídá shodu. Rozpis v „Úpravy po převodu“, 3. kolo.
+- Testy v synchronním Playwrightu: po kliku čekat přes page.wait_for_timeout / wait_for_url, ne time.sleep (nepumpuje události, page.url ukazuje starou stránku).
 - Otevřená otázka pro uživatele: jen otázka 3 (starý server 88.146.221.173 a job v Jenkinsu, Task 13). Otázky 1, 2 a 4 jsou vyřešené.
 ```
